@@ -1,4 +1,4 @@
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient, createServerClient as createSSRServerClient } from '@supabase/ssr';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 
@@ -33,23 +33,35 @@ export function createClient() {
 }
 
 /**
- * Server-side Supabase client helper for Server Components, Server Actions,
- * and Route Handlers using next/headers cookie store.
+ * Server-side Supabase client for Server Components, Server Actions,
+ * and Route Handlers. Uses @supabase/ssr createServerClient so that
+ * cookies are managed automatically and Database generics resolve correctly.
  */
 export async function createServerClient() {
   const { cookies } = await import('next/headers');
   const cookieStore = await cookies();
 
-  return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: false,
-    },
-    global: {
-      headers: {
-        Cookie: cookieStore.toString(),
+  return createSSRServerClient<Database>(
+    supabaseUrl || 'https://placeholder-url.supabase.co',
+    supabaseAnonKey || 'placeholder-key',
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          } catch {
+            // setAll called from a Server Component — safe to ignore.
+            // Cookies will be set by middleware instead.
+          }
+        },
       },
-    },
-  });
+    }
+  );
 }
 
 /**

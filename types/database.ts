@@ -38,16 +38,16 @@ export type AuditAction =
 // TABLE ROW INTERFACES
 // ==============================================================================
 
-export interface User {
+export type User = {
   id: string; // uuid, references auth.users(id)
   role: UserRole;
   name: string;
   tier: UserTier;
   created_at: string; // ISO 8601 timestamp
   updated_at: string;
-}
+};
 
-export interface Space {
+export type Space = {
   id: string; // uuid
   name: string;
   type: SpaceType;
@@ -55,9 +55,9 @@ export interface Space {
   is_active: boolean;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface Booking {
+export type Booking = {
   id: string; // uuid
   user_id: string; // uuid -> users.id
   space_id: string; // uuid -> spaces.id
@@ -67,18 +67,18 @@ export interface Booking {
   eligibility_doc_url: string | null;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface AuditLog {
+export type AuditLog = {
   id: string; // uuid
   booking_id: string | null; // uuid -> bookings.id
   action: AuditAction;
   reason: string | null; // Mandatory when action is 'REJECTED'
   performed_by: string; // uuid -> users.id
   created_at: string;
-}
+};
 
-export interface ConditionReport {
+export type ConditionReport = {
   id: string; // uuid
   booking_id: string; // uuid -> bookings.id
   phase: ReportPhase;
@@ -86,29 +86,29 @@ export interface ConditionReport {
   notes: string | null;
   damage_reported: boolean;
   created_at: string;
-}
+};
 
 // ==============================================================================
 // INSERT & UPDATE TYPES
 // ==============================================================================
 
-export interface UserInsert {
+export type UserInsert = {
   id: string;
   role?: UserRole;
   name: string;
   tier?: UserTier;
   created_at?: string;
   updated_at?: string;
-}
+};
 
-export interface UserUpdate {
+export type UserUpdate = {
   role?: UserRole;
   name?: string;
   tier?: UserTier;
   updated_at?: string;
-}
+};
 
-export interface SpaceInsert {
+export type SpaceInsert = {
   id?: string;
   name: string;
   type: SpaceType;
@@ -116,17 +116,17 @@ export interface SpaceInsert {
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;
-}
+};
 
-export interface SpaceUpdate {
+export type SpaceUpdate = {
   name?: string;
   type?: SpaceType;
   capacity?: number;
   is_active?: boolean;
   updated_at?: string;
-}
+};
 
-export interface BookingInsert {
+export type BookingInsert = {
   id?: string;
   user_id: string;
   space_id: string;
@@ -136,27 +136,29 @@ export interface BookingInsert {
   eligibility_doc_url?: string | null;
   created_at?: string;
   updated_at?: string;
-}
+};
 
-export interface BookingUpdate {
+export type BookingUpdate = {
   space_id?: string;
   start_date?: string;
   end_date?: string;
   status?: BookingStatus;
   eligibility_doc_url?: string | null;
   updated_at?: string;
-}
+};
 
-export interface AuditLogInsert {
+export type AuditLogInsert = {
   id?: string;
   booking_id?: string | null;
   action: AuditAction;
   reason?: string | null;
   performed_by: string;
   created_at?: string;
-}
+};
 
-export interface ConditionReportInsert {
+export type AuditLogUpdate = Partial<AuditLogInsert>;
+
+export type ConditionReportInsert = {
   id?: string;
   booking_id: string;
   phase: ReportPhase;
@@ -164,30 +166,32 @@ export interface ConditionReportInsert {
   notes?: string | null;
   damage_reported?: boolean;
   created_at?: string;
-}
+};
 
-export interface ConditionReportUpdate {
+export type ConditionReportUpdate = {
   photo_url?: string;
   notes?: string | null;
   damage_reported?: boolean;
-}
+};
 
 // ==============================================================================
 // COMPOSITE & EXTENDED TYPES (Useful for UI views & Joins)
 // ==============================================================================
 
-export interface BookingWithDetails extends Booking {
+export type BookingWithDetails = Booking & {
   user?: User;
   space?: Space;
   condition_reports?: ConditionReport[];
   audit_logs?: AuditLog[];
-}
+};
 
 // ==============================================================================
 // SUPABASE CLIENT DATABASE MAPPING
+// Must conform to GenericSchema: { Tables, Views, Functions }
+// GenericTable: { Row, Insert, Update, Relationships: GenericRelationship[] }
 // ==============================================================================
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       users: {
@@ -226,7 +230,7 @@ export interface Database {
       audit_logs: {
         Row: AuditLog;
         Insert: AuditLogInsert;
-        Update: Partial<AuditLogInsert>;
+        Update: AuditLogUpdate;
         Relationships: [
           {
             foreignKeyName: 'audit_logs_booking_id_fkey';
@@ -259,7 +263,8 @@ export interface Database {
         ];
       };
     };
-    Views: Record<string, never>;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    Views: {};
     Functions: {
       is_admin: {
         Args: Record<string, never>;
