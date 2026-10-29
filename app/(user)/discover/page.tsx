@@ -13,8 +13,8 @@ import {
   Monitor,
   Trophy,
   CheckCircle2,
-  SlidersHorizontal,
 } from 'lucide-react';
+import { getRequestedSpaceRecords, isSpaceRequested } from '@/lib/requested-spaces';
 
 const DEFAULT_SPACES: Space[] = [
   {
@@ -82,6 +82,7 @@ export default function DiscoverSpacesPage() {
   const [selectedType, setSelectedType] = React.useState<'all' | SpaceType>('all');
   const [capacityFilter, setCapacityFilter] = React.useState<number>(0);
   const [recentBookingRef, setRecentBookingRef] = React.useState<string | null>(null);
+  const [requestedSpaceIds, setRequestedSpaceIds] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -108,6 +109,23 @@ export default function DiscoverSpacesPage() {
     };
   }, []);
 
+  // Sync requested spaces from localStorage and custom events
+  React.useEffect(() => {
+    const refreshRequested = () => {
+      const records = getRequestedSpaceRecords();
+      setRequestedSpaceIds(records.map((r) => r.spaceId));
+    };
+
+    refreshRequested();
+    window.addEventListener('idlespaces_requested_changed', refreshRequested);
+    window.addEventListener('storage', refreshRequested);
+
+    return () => {
+      window.removeEventListener('idlespaces_requested_changed', refreshRequested);
+      window.removeEventListener('storage', refreshRequested);
+    };
+  }, []);
+
   const filteredSpaces = React.useMemo(() => {
     return spaces.filter((space) => {
       const matchesSearch =
@@ -119,8 +137,19 @@ export default function DiscoverSpacesPage() {
     });
   }, [spaces, searchQuery, selectedType, capacityFilter]);
 
-  const handleBookingSuccess = (bookingId: string) => {
+  const handleBookingSuccess = (bookingId: string, spaceId?: string) => {
     setRecentBookingRef(bookingId);
+    if (spaceId) {
+      setRequestedSpaceIds((prev) => (prev.includes(spaceId) ? prev : [...prev, spaceId]));
+    }
+  };
+
+  const handleRequestClick = (space: Space) => {
+    // If already requested, disallow opening the modal
+    if (requestedSpaceIds.includes(space.id) || isSpaceRequested(space)) {
+      return;
+    }
+    setSelectedSpace(space);
   };
 
   return (
@@ -297,13 +326,19 @@ export default function DiscoverSpacesPage() {
         <section>
           {filteredSpaces.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredSpaces.map((space) => (
-                <SpaceCard
-                  key={space.id}
-                  space={space}
-                  onRequestAccess={(selected) => setSelectedSpace(selected)}
-                />
-              ))}
+              {filteredSpaces.map((space) => {
+                const requested =
+                  requestedSpaceIds.includes(space.id) || isSpaceRequested(space);
+
+                return (
+                  <SpaceCard
+                    key={space.id}
+                    space={space}
+                    isRequested={requested}
+                    onRequestAccess={handleRequestClick}
+                  />
+                );
+              })}
             </div>
           ) : (
             /* Empty State */

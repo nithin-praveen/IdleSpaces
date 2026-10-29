@@ -23,12 +23,13 @@ import {
 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { useAuth } from '@/components/AuthProvider';
+import { markSpaceAsRequested, isSpaceRequested } from '@/lib/requested-spaces';
 
 interface BookingModalProps {
   space: Space | null;
   isOpen: boolean;
   onClose: () => void;
-  onBookingSuccess?: (bookingId: string) => void;
+  onBookingSuccess?: (bookingId: string, spaceId?: string) => void;
 }
 
 export function BookingModal({
@@ -80,6 +81,8 @@ export function BookingModal({
 
   if (!space) return null;
 
+  const alreadyRequested = isSpaceRequested(space);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -125,25 +128,36 @@ export function BookingModal({
       );
 
       if (result.success) {
+        const bId = result.data.booking.id;
+        const aId = result.data.auditLog.id;
         setSuccessData({
-          bookingId: result.data.booking.id,
-          auditLogId: result.data.auditLog.id,
+          bookingId: bId,
+          auditLogId: aId,
           timestamp: new Date().toISOString(),
         });
-        onBookingSuccess?.(result.data.booking.id);
+        markSpaceAsRequested(space.id, space.name, bId);
+        onBookingSuccess?.(bId, space.id);
       } else {
+        const mockBId = `BK-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+        const mockAId = `AUD-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
         setSuccessData({
-          bookingId: `BK-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
-          auditLogId: `AUD-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+          bookingId: mockBId,
+          auditLogId: mockAId,
           timestamp: new Date().toISOString(),
         });
+        markSpaceAsRequested(space.id, space.name, mockBId);
+        onBookingSuccess?.(mockBId, space.id);
       }
     } catch {
+      const fallbackBId = `BK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      const fallbackAId = `AUD-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
       setSuccessData({
-        bookingId: `BK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-        auditLogId: `AUD-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+        bookingId: fallbackBId,
+        auditLogId: fallbackAId,
         timestamp: new Date().toISOString(),
       });
+      markSpaceAsRequested(space.id, space.name, fallbackBId);
+      onBookingSuccess?.(fallbackBId, space.id);
     } finally {
       setIsSubmitting(false);
     }
@@ -236,6 +250,39 @@ export function BookingModal({
                 onClick={onClose}
               >
                 Close & Return to Discover
+              </button>
+            </div>
+          </div>
+        ) : alreadyRequested ? (
+          /* Already Requested Notice Screen */
+          <div className="modal-scroll flex-1 p-6 sm:p-8 space-y-6 text-center">
+            <div className="mx-auto h-16 w-16 rounded-2xl bg-[#D9DADF] border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B] shadow-[2px_2px_0px_0px_#1C1D1A]">
+              <CheckCircle2 className="h-9 w-9" />
+            </div>
+            <DialogTitle className="text-2xl font-display font-extrabold text-[#1C1D1A]">
+              Request Already Submitted
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#7C7D75] max-w-md mx-auto font-semibold">
+              An access allocation application for <strong className="text-[#1C1D1A]">{space.name}</strong> has already been submitted and is currently <strong className="text-[#DD700B]">PENDING REVIEW</strong> in the statutory audit ledger. Duplicate requests for the same facility are locked.
+            </DialogDescription>
+
+            <div className="rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] p-4 text-xs text-[#1C1D1A] space-y-1 text-left">
+              <p className="font-display font-extrabold flex items-center gap-1.5 text-xs">
+                <ShieldCheck className="h-4 w-4 text-[#DD700B]" />
+                Statutory Status: Under Official Review
+              </p>
+              <p className="leading-relaxed font-medium">
+                Your application is queued in the Dean Administrative Ledger. You can track this allocation and check-in inspection reports under the Bookings Portal.
+              </p>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                className="px-8 py-3 bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs rounded-2xl border-2 border-[#1C1D1A] cursor-pointer"
+                onClick={onClose}
+              >
+                Close & Return
               </button>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { BookingModal } from '@/components/BookingModal';
 import { ListSpaceModal } from '@/components/ListSpaceModal';
 import type { Space } from '@/types/database';
+import { getRequestedSpaceRecords, isSpaceRequested } from '@/lib/requested-spaces';
 import {
   ArrowUpRight,
   ShieldCheck,
@@ -67,8 +68,28 @@ export default function CalmIdleSpacesHome() {
   const [selectedSpace, setSelectedSpace] = React.useState<Space | null>(null);
   const [isBookingOpen, setIsBookingOpen] = React.useState<boolean>(false);
   const [isListModalOpen, setIsListModalOpen] = React.useState<boolean>(false);
+  const [requestedSpaceIds, setRequestedSpaceIds] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    const refreshRequested = () => {
+      const records = getRequestedSpaceRecords();
+      setRequestedSpaceIds(records.map((r) => r.spaceId));
+    };
+
+    refreshRequested();
+    window.addEventListener('idlespaces_requested_changed', refreshRequested);
+    window.addEventListener('storage', refreshRequested);
+
+    return () => {
+      window.removeEventListener('idlespaces_requested_changed', refreshRequested);
+      window.removeEventListener('storage', refreshRequested);
+    };
+  }, []);
 
   const handleOpenBooking = (space: Space) => {
+    if (requestedSpaceIds.includes(space.id) || isSpaceRequested(space)) {
+      return;
+    }
     setSelectedSpace(space);
     setIsBookingOpen(true);
   };
@@ -539,6 +560,8 @@ export default function CalmIdleSpacesHome() {
                   : index === 1
                   ? 'bg-[#7C7D75] text-[#FCF8D8]'
                   : 'bg-[#ADACA7] text-[#1C1D1A]';
+              const isRequested =
+                requestedSpaceIds.includes(facility.id) || isSpaceRequested(facility);
 
               return (
                 <div
@@ -550,9 +573,16 @@ export default function CalmIdleSpacesHome() {
                       <span className={`text-[10px] font-display font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-[#1C1D1A] ${tagBg}`}>
                         {facility.type.replace('_', ' ')}
                       </span>
-                      <span className="text-[10px] font-mono font-bold text-[#7C7D75]">
-                        #{facility.id.substring(0, 6)}
-                      </span>
+                      {isRequested ? (
+                        <span className="text-[10px] font-display font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] flex items-center gap-1">
+                          <CheckCircle2 className="h-3 w-3 text-[#DD700B]" />
+                          Request Given
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono font-bold text-[#7C7D75]">
+                          #{facility.id.substring(0, 6)}
+                        </span>
+                      )}
                     </div>
 
                     <h3 className="font-display font-extrabold text-xl text-[#1C1D1A] tracking-tight mb-2 leading-snug">
@@ -575,14 +605,26 @@ export default function CalmIdleSpacesHome() {
                       </span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleOpenBooking(facility)}
-                      className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-2 px-3.5 rounded-xl border-2 border-[#1C1D1A] flex items-center gap-1.5 transition-all cursor-pointer"
-                    >
-                      <span>Book Space</span>
-                      <ArrowUpRight className="h-3.5 w-3.5 text-[#DD700B]" />
-                    </button>
+                    {isRequested ? (
+                      <button
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        className="bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-xs py-2 px-3.5 rounded-xl border-2 border-[#1C1D1A] flex items-center gap-1.5 opacity-90 cursor-not-allowed select-none"
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5 text-[#DD700B]" />
+                        <span>Request Given</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenBooking(facility)}
+                        className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-2 px-3.5 rounded-xl border-2 border-[#1C1D1A] flex items-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <span>Book Space</span>
+                        <ArrowUpRight className="h-3.5 w-3.5 text-[#DD700B]" />
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -649,6 +691,11 @@ export default function CalmIdleSpacesHome() {
         space={selectedSpace}
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
+        onBookingSuccess={(bookingId, spaceId) => {
+          if (spaceId) {
+            setRequestedSpaceIds((prev) => (prev.includes(spaceId) ? prev : [...prev, spaceId]));
+          }
+        }}
       />
 
       {/* List Space Modal */}

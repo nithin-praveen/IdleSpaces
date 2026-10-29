@@ -10,6 +10,7 @@ import {
   MapPin,
   ShieldCheck,
   ArrowUpRight,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface SpaceCardProps {
@@ -17,6 +18,7 @@ interface SpaceCardProps {
   onRequestAccess: (space: Space) => void;
   location?: string;
   amenities?: string[];
+  isRequested?: boolean;
 }
 
 export function SpaceCard({
@@ -24,6 +26,7 @@ export function SpaceCard({
   onRequestAccess,
   location,
   amenities,
+  isRequested = false,
 }: SpaceCardProps) {
   const getTypeConfig = (type: SpaceType) => {
     switch (type) {
@@ -81,10 +84,17 @@ export function SpaceCard({
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 rounded-full bg-[#FCF8D8] px-2.5 py-1 text-[10px] font-extrabold text-[#1C1D1A] border border-[#1C1D1A]">
-            <span className="h-2 w-2 rounded-full bg-[#DD700B] animate-pulse" />
-            <span>Available</span>
-          </div>
+          {isRequested ? (
+            <div className="flex items-center gap-1.5 rounded-full bg-[#D9DADF] px-2.5 py-1 text-[10px] font-extrabold text-[#1C1D1A] border border-[#1C1D1A]">
+              <CheckCircle2 className="h-3 w-3 text-[#DD700B]" />
+              <span>Request Given</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 rounded-full bg-[#FCF8D8] px-2.5 py-1 text-[10px] font-extrabold text-[#1C1D1A] border border-[#1C1D1A]">
+              <span className="h-2 w-2 rounded-full bg-[#DD700B] animate-pulse" />
+              <span>Available</span>
+            </div>
+          )}
         </div>
 
         <div>
@@ -144,14 +154,27 @@ export function SpaceCard({
           <span className="text-[#7C7D75] font-semibold text-[10px]">₹0 Tariff for NGOs</span>
         </div>
 
-        <button
-          type="button"
-          onClick={() => onRequestAccess(space)}
-          className="bg-[#DD700B] hover:bg-[#c96205] text-white font-display font-extrabold text-xs py-2 px-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center gap-1.5 transition-all hover:-translate-y-0.5 cursor-pointer"
-        >
-          <span>Request Access</span>
-          <ArrowUpRight className="h-3.5 w-3.5" />
-        </button>
+        {isRequested ? (
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            className="bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-xs py-2 px-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center gap-1.5 cursor-not-allowed opacity-90 select-none"
+            title="Access request already registered for this facility"
+          >
+            <CheckCircle2 className="h-3.5 w-3.5 text-[#DD700B]" />
+            <span>Request Given</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onRequestAccess(space)}
+            className="bg-[#DD700B] hover:bg-[#c96205] text-white font-display font-extrabold text-xs py-2 px-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center gap-1.5 transition-all hover:-translate-y-0.5 cursor-pointer"
+          >
+            <span>Request Access</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
     </div>
   );
