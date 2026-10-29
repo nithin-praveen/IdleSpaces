@@ -26,6 +26,8 @@ import {
   Eye,
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useAuth } from '@/components/AuthProvider';
+import { LogIn } from 'lucide-react';
 
 interface UserBooking {
   id: string;

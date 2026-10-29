@@ -33,6 +33,8 @@ import {
   X,
 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
+import { useAuth } from '@/components/AuthProvider';
+import Link from 'next/link';
 
 interface BookingModalProps {
   space: Space | null;
@@ -47,6 +49,7 @@ export function BookingModal({
   onClose,
   onBookingSuccess,
 }: BookingModalProps) {
+  const { user } = useAuth();
   const [todayStr, setTodayStr] = React.useState<string>('');
   const [startDate, setStartDate] = React.useState<string>('');
   const [endDate, setEndDate] = React.useState<string>('');
@@ -81,8 +84,13 @@ export function BookingModal({
       setSuccessData(null);
       setSelectedFile(null);
       setMockFileUploaded(false);
+      if (user) {
+        setOrgType(user.role === 'corporate' ? 'corporate' : 'ngo');
+        setOrgName(user.organization || 'Pratham Youth Initiative');
+        setApplicantEmail(user.email || 'nodal.officer@prathamyouth.org');
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, user]);
 
   if (!space) return null;
 
@@ -122,7 +130,7 @@ export function BookingModal({
     try {
       // In production, user_id comes from auth.users (UUID).
       // If client is operating in demonstration / unauthenticated mode, we use a deterministic UUID.
-      const fallbackUserId = 'a0000000-0000-0000-0000-000000000001';
+      const fallbackUserId = user?.id || 'b1111111-2222-3333-4444-555555555001';
       const fileDocumentUrl = selectedFile
         ? `https://storage.idlespaces.gov.in/docs/${encodeURIComponent(selectedFile.name)}`
         : 'https://storage.idlespaces.gov.in/docs/registration-cert-verified.pdf';
