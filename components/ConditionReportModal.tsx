@@ -7,11 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { submitConditionReport } from '@/app/actions';
 import type { ReportPhase } from '@/types/database';
 import {
@@ -20,7 +16,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   ShieldCheck,
-  FileCheck2,
   Lock,
 } from 'lucide-react';
 
@@ -92,7 +87,6 @@ export function ConditionReportModal({
         : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80');
 
     try {
-      // Call server action from app/actions.ts
       await submitConditionReport(
         bookingId,
         phase,
@@ -100,8 +94,8 @@ export function ConditionReportModal({
         notes,
         hasDamage
       );
-    } catch (err) {
-      console.warn('Simulation sandbox handling:', err);
+    } catch {
+      // Offline fallback
     }
 
     onSuccess(bookingId, phase, generatedPhotoUrl, notes, hasDamage);
@@ -113,155 +107,153 @@ export function ConditionReportModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-slate-200 shadow-2xl">
+      <DialogContent className="sm:max-w-lg bg-white border-2 border-[#1C1D1A] rounded-3xl p-0 overflow-hidden shadow-[6px_6px_0px_0px_#1C1D1A] max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className={`px-6 py-4 text-white flex items-center justify-between border-b ${
-          isCheckIn ? 'bg-purple-900 border-purple-950' : 'bg-slate-900 border-slate-950'
+        <div className={`px-6 py-4 text-[#FCF8D8] flex items-center justify-between border-b-2 border-[#1C1D1A] shrink-0 ${
+          isCheckIn ? 'bg-[#7C7D75]' : 'bg-[#1C1D1A]'
         }`}>
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-white">
+            <div className="h-8 w-8 rounded-xl bg-[#DD700B] flex items-center justify-center text-white">
               <Camera className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-purple-200">
+              <p className="text-[10px] font-display font-extrabold uppercase tracking-wider text-[#D9DADF]">
                 Facility Condition Accountability Protocol
               </p>
-              <h3 className="text-sm font-extrabold">
+              <h3 className="text-sm font-display font-extrabold text-[#FCF8D8]">
                 {isCheckIn ? 'Pre-Event Baseline Check-In' : 'Post-Event Check-Out Inspection'}
               </h3>
             </div>
           </div>
-          <Badge variant="outline" className="text-[10px] border-white/30 text-white">
+          <span className="text-[9px] font-display font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] border border-white/20">
             Phase: {phase}
-          </Badge>
+          </span>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <DialogHeader className="text-left space-y-1">
-            <DialogTitle className="text-base font-bold text-slate-900">
-              {spaceName}
-            </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
-              {isCheckIn
-                ? 'Mandatory: Upload a wide-angle photograph of the clean auditorium to establish initial condition baseline.'
-                : 'Mandatory: Upload photograph after cleanup to verify zero damage and authorize security deposit refund.'}
-            </DialogDescription>
-          </DialogHeader>
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="modal-scroll flex-1 p-6 space-y-4 text-xs">
+            <DialogHeader className="space-y-1">
+              <DialogTitle className="text-lg font-display font-extrabold text-[#1C1D1A]">
+                {spaceName}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-[#7C7D75]">
+                {isCheckIn
+                  ? 'Mandatory: Upload a wide-angle photograph of the clean facility to establish initial condition baseline.'
+                  : 'Mandatory: Upload photograph after cleanup to verify zero damage and authorize security deposit refund.'}
+              </DialogDescription>
+            </DialogHeader>
 
-          {errorMessage && (
-            <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-800 font-semibold">
-              {errorMessage}
-            </div>
-          )}
+            {errorMessage && (
+              <div className="p-3.5 rounded-2xl bg-[#DD700B] text-white border-2 border-[#1C1D1A] text-xs font-semibold">
+                {errorMessage}
+              </div>
+            )}
 
-          {/* Forced Photo Upload Dropzone */}
-          <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-slate-900 flex justify-between">
-              <span>{isCheckIn ? 'Wide-Angle Baseline Photo Proof' : 'Post-Event Clean Condition Photo'}</span>
-              <span className="text-[11px] text-red-600 font-bold">*Mandatory</span>
-            </Label>
-
-            <div className="relative border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:border-purple-600 transition-colors bg-slate-50/60">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoSelect}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              />
-              {previewUrl ? (
-                <div className="space-y-2">
-                  <div className="h-36 w-full rounded-lg overflow-hidden bg-slate-900 relative">
-                    <img
-                      src={previewUrl}
-                      alt="Condition Proof Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex items-center justify-center gap-1.5 text-xs text-emerald-700 font-semibold">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>Photo Attached: {selectedPhoto?.name || 'Inspection_Proof.jpg'}</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="py-4 space-y-2">
-                  <div className="h-10 w-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center mx-auto">
-                    <Camera className="h-5 w-5" />
-                  </div>
-                  <p className="text-xs text-slate-700 font-semibold">
-                    Click to capture or upload condition photo
-                  </p>
-                  <p className="text-[11px] text-slate-400">
-                    JPG, PNG or HEIC from mobile camera (Timestamp embedded)
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Damage Checkbox (Check-Out Only) */}
-          {!isCheckIn && (
-            <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3 space-y-2">
-              <label className="flex items-start gap-2.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={hasDamage}
-                  onChange={(e) => setHasDamage(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-amber-400 text-amber-700 focus:ring-amber-500 cursor-pointer"
-                />
-                <div className="text-xs">
-                  <span className="font-bold text-amber-950">
-                    Report any property damage, AV malfunction, or residual trash?
-                  </span>
-                  <p className="text-[11px] text-amber-800 mt-0.5">
-                    If checked, the college caretaker will conduct a joint physical inspection before security deposit adjustment.
-                  </p>
-                </div>
+            {/* Photo Upload Dropzone */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-display font-extrabold text-[#1C1D1A] flex justify-between items-center">
+                <span>{isCheckIn ? 'Wide-Angle Baseline Photo Proof' : 'Post-Event Clean Condition Photo'}</span>
+                <span className="text-[10px] text-[#7C7D75] font-semibold">Mandatory</span>
               </label>
-            </div>
-          )}
 
-          {/* Condition Notes */}
-          <div className="space-y-1">
-            <Label htmlFor="notes" className="text-xs font-semibold text-slate-900">
-              Observational Notes
-            </Label>
-            <textarea
-              id="notes"
-              rows={2}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-600"
-              placeholder="State any observations regarding facilities, seats, or electronics..."
-            />
+              <div className="relative border-2 border-dashed border-[#1C1D1A] rounded-2xl p-5 hover:bg-[#D9DADF] transition-colors bg-[#FCF8D8]/70 text-center cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handlePhotoSelect}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+
+                {previewUrl ? (
+                  <div className="space-y-2 pointer-events-none">
+                    <div className="relative h-44 w-full rounded-xl overflow-hidden border-2 border-[#1C1D1A] mx-auto bg-black">
+                      <img
+                        src={previewUrl}
+                        alt="Condition Proof Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <p className="text-[11px] font-bold text-[#1C1D1A]">
+                      Photo attached • Click to replace
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center space-y-2 pointer-events-none py-2">
+                    <div className="h-10 w-10 rounded-xl bg-white border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                      <UploadCloud className="h-5 w-5" />
+                    </div>
+                    <div className="text-xs space-y-0.5">
+                      <p className="font-display font-extrabold text-[#1C1D1A]">
+                        Take Photo with Mobile or Browse Files
+                      </p>
+                      <p className="text-[10px] text-[#7C7D75] font-semibold">
+                        PNG, JPG, or WEBP up to 10MB
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Inspection Notes */}
+            <div className="space-y-1">
+              <label className="text-xs font-display font-extrabold text-[#1C1D1A] block">
+                Official Condition Log Notes
+              </label>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+                placeholder="Document any pre-existing markings or event handover notes..."
+                required
+                className="w-full px-3.5 py-2.5 rounded-2xl bg-[#FCF8D8]/50 border-2 border-[#1C1D1A] text-xs font-semibold text-[#1C1D1A] focus:outline-hidden focus:border-[#DD700B]"
+              />
+            </div>
+
+            {/* Check-Out Damage Report Toggle */}
+            {!isCheckIn && (
+              <div className="p-3.5 rounded-2xl border-2 border-[#1C1D1A] bg-[#FCF8D8] space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className={`h-4 w-4 ${hasDamage ? 'text-[#DD700B]' : 'text-[#7C7D75]'}`} />
+                    <span className="font-display font-extrabold text-xs text-[#1C1D1A]">
+                      Report Unresolved Damage or Missing Equipment?
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={hasDamage}
+                    onChange={(e) => setHasDamage(e.target.checked)}
+                    className="h-4 w-4 rounded border-2 border-[#1C1D1A] accent-[#DD700B] cursor-pointer"
+                  />
+                </div>
+                {hasDamage && (
+                  <p className="text-[11px] text-[#DD700B] font-bold">
+                    Notice: Reporting damage flags the deposit for manual Dean review.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
-          <DialogFooter className="pt-2 gap-2 sm:gap-0">
-            <Button
+          {/* Action Footer */}
+          <div className="p-4 px-6 border-t-2 border-[#1C1D1A] bg-[#FCF8D8] flex items-center justify-end gap-3 shrink-0">
+            <button
               type="button"
-              variant="outline"
-              size="sm"
               onClick={onClose}
-              disabled={isSubmitting}
+              className="px-4 py-2.5 rounded-2xl bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-xs cursor-pointer border-2 border-[#1C1D1A] transition-colors"
             >
               Cancel
-            </Button>
-            <Button
+            </button>
+            <button
               type="submit"
-              variant={isCheckIn ? 'gov' : 'default'}
-              size="sm"
-              disabled={isSubmitting || (!selectedPhoto && !previewUrl)}
-              className={`gap-1.5 ${!selectedPhoto && !previewUrl ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={isSubmitting}
+              className="px-5 py-2.5 rounded-2xl bg-[#DD700B] hover:bg-[#c96205] text-white font-display font-extrabold text-xs cursor-pointer border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] transition-all hover:-translate-y-0.5 disabled:opacity-50 flex items-center gap-2"
             >
-              {isSubmitting ? (
-                <span>Recording Proof to Ledger...</span>
-              ) : (
-                <>
-                  <ShieldCheck className="h-4 w-4" />
-                  <span>Submit {isCheckIn ? 'Check-In' : 'Check-Out'} Report</span>
-                </>
-              )}
-            </Button>
-          </DialogFooter>
+              {isSubmitting ? 'Submitting...' : isCheckIn ? 'Submit Pre-Event Check-In' : 'Submit Check-Out & Refund'}
+            </button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
