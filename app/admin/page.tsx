@@ -180,7 +180,7 @@ export default function AdminPage() {
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <div className="flex items-center gap-3 text-slate-500 text-sm">
-            <div className="h-5 w-5 border-2 border-blue-900 border-t-transparent rounded-full animate-spin" />
+            <div className="h-5 w-5 border-2 border-[#DD700B] border-t-transparent rounded-full animate-spin" />
             <span>Verifying Institutional Administrator credentials...</span>
           </div>
         </div>
@@ -191,7 +191,7 @@ export default function AdminPage() {
   // Access Denied / Security Notice for non-admins
   if (!user || user.role !== 'admin') {
     return (
-      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col justify-between">
+      <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] font-body selection:bg-[#DD700B] selection:text-white flex flex-col justify-between">
         <Navbar />
         <main className="flex-1 flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-white rounded-2xl border border-red-200 shadow-xl overflow-hidden text-center p-8 space-y-6">
@@ -213,7 +213,7 @@ export default function AdminPage() {
 
             <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-left space-y-2 text-xs">
               <p className="font-semibold text-slate-700 flex items-center gap-1.5">
-                <Lock className="h-3.5 w-3.5 text-blue-900" />
+                <Lock className="h-3.5 w-3.5 text-[#1C1D1A]" />
                 Required Role: Institutional Administrator
               </p>
               <p className="text-slate-500 text-[11px] leading-relaxed">
@@ -225,7 +225,7 @@ export default function AdminPage() {
               <button
                 type="button"
                 onClick={() => switchDemoRole('admin')}
-                className="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-2.5 px-4 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-2"
+                className="w-full bg-[#DD700B] hover:bg-[#c96205] text-white font-semibold py-2.5 px-4 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-2"
               >
                 <ShieldCheck className="h-4 w-4" />
                 <span>Switch to Dean / Admin Account (1-Click Demo)</span>
@@ -330,12 +330,12 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] font-body selection:bg-[#DD700B] selection:text-white flex flex-col justify-between">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Admin Header Banner */}
-        <section className="rounded-2xl bg-slate-900 p-6 sm:p-8 text-white border border-slate-800 shadow-md">
+        <section className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] p-6 sm:p-8 space-y-4 text-[#1C1D1A]">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-300 border border-blue-500/30">
@@ -350,7 +350,7 @@ export default function AdminPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3 bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60">
+            <div className="flex items-center gap-3 bg-[#FCF8D8] p-3.5 rounded-xl border border-[#1C1D1A]">
               <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-sm">
                 AD
               </div>
@@ -363,24 +363,24 @@ export default function AdminPage() {
           </div>
 
           {/* Quick Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-slate-800 mt-6">
-            <div className="rounded-xl bg-slate-800/60 p-3.5 border border-slate-700/60">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-[#1C1D1A] mt-6">
+            <div className="rounded-xl bg-[#FCF8D8] p-3.5 border border-[#1C1D1A]">
               <p className="text-[10px] uppercase font-semibold text-amber-400">Pending Review</p>
               <p className="text-2xl font-bold text-white">{pendingList.length} Requests</p>
             </div>
-            <div className="rounded-xl bg-slate-800/60 p-3.5 border border-slate-700/60">
+            <div className="rounded-xl bg-[#FCF8D8] p-3.5 border border-[#1C1D1A]">
               <p className="text-[10px] uppercase font-semibold text-emerald-400">Sanctioned</p>
               <p className="text-2xl font-bold text-white">
                 {bookings.filter((b) => b.status === 'approved').length} Bookings
               </p>
             </div>
-            <div className="rounded-xl bg-slate-800/60 p-3.5 border border-slate-700/60">
+            <div className="rounded-xl bg-[#FCF8D8] p-3.5 border border-[#1C1D1A]">
               <p className="text-[10px] uppercase font-semibold text-red-400">Justified Rejections</p>
               <p className="text-2xl font-bold text-white">
                 {bookings.filter((b) => b.status === 'rejected').length} Decisions
               </p>
             </div>
-            <div className="rounded-xl bg-slate-800/60 p-3.5 border border-slate-700/60">
+            <div className="rounded-xl bg-[#FCF8D8] p-3.5 border border-[#1C1D1A]">
               <p className="text-[10px] uppercase font-semibold text-blue-400">Audit Compliance</p>
               <p className="text-2xl font-bold text-emerald-400">100% Sealed</p>
             </div>
@@ -412,7 +412,7 @@ export default function AdminPage() {
             onClick={() => setActiveTab('pending')}
             className={`pb-3 px-1 border-b-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'pending'
-                ? 'border-blue-900 text-blue-900 font-bold'
+                ? 'border-[#DD700B] text-[#1C1D1A] font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -427,7 +427,7 @@ export default function AdminPage() {
             onClick={() => setActiveTab('all')}
             className={`pb-3 px-1 border-b-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'all'
-                ? 'border-blue-900 text-blue-900 font-bold'
+                ? 'border-[#DD700B] text-[#1C1D1A] font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -439,7 +439,7 @@ export default function AdminPage() {
             onClick={() => setActiveTab('audit')}
             className={`pb-3 px-1 border-b-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'audit'
-                ? 'border-blue-900 text-blue-900 font-bold'
+                ? 'border-[#DD700B] text-[#1C1D1A] font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -452,7 +452,7 @@ export default function AdminPage() {
             onClick={() => setActiveTab('security')}
             className={`pb-3 px-1 border-b-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'security'
-                ? 'border-blue-900 text-blue-900 font-bold'
+                ? 'border-[#DD700B] text-[#1C1D1A] font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -547,7 +547,7 @@ export default function AdminPage() {
                                 applicant: booking.applicantName,
                               })
                             }
-                            className="inline-flex items-center gap-1.5 text-xs text-blue-900 font-semibold hover:underline mt-1 cursor-pointer"
+                            className="inline-flex items-center gap-1.5 text-xs text-[#1C1D1A] font-semibold hover:underline mt-1 cursor-pointer"
                           >
                             <FileText className="h-4 w-4 text-blue-700" />
                             <span>{booking.docName}</span>
@@ -641,7 +641,7 @@ export default function AdminPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Lock className="h-4 w-4 text-blue-900" />
+                  <Lock className="h-4 w-4 text-[#1C1D1A]" />
                   Statutory Public Asset Audit Ledger
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -684,7 +684,7 @@ export default function AdminPage() {
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-              <div className="p-4 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="p-4 bg-white text-white flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="font-bold">Next.js 16 Security Proxy Guard Active</span>

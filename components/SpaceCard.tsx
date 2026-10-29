@@ -1,23 +1,15 @@
 'use client';
 
 import * as React from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import type { Space, SpaceType } from '@/types/database';
 import {
   Users,
   Monitor,
   Trophy,
   Building,
-  CheckCircle2,
-  Sparkles,
   MapPin,
-  Calendar,
   ShieldCheck,
   ArrowUpRight,
-  Wifi,
-  Volume2,
 } from 'lucide-react';
 
 interface SpaceCardProps {
@@ -33,46 +25,37 @@ export function SpaceCard({
   location,
   amenities,
 }: SpaceCardProps) {
-  // Helper for type styling
   const getTypeConfig = (type: SpaceType) => {
     switch (type) {
       case 'auditorium':
         return {
           label: 'Auditorium',
-          badgeVariant: 'purple' as const,
+          badgeBg: 'bg-[#7C7D75] text-[#FCF8D8]',
           icon: Building,
-          colorClass: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300',
-          gradientClass: 'from-purple-600/10 via-transparent to-transparent',
-          defaultAmenities: ['Dual 4K Projectors', 'Dolby Surround PA', 'VIP Stage', 'Central AC'],
+          defaultAmenities: ['Dual 4K Projectors', 'Surround PA', 'VIP Stage', 'Central AC'],
           defaultLocation: 'Main Administrative Quad, Floor 1',
         };
       case 'computer_lab':
         return {
           label: 'Computer Lab',
-          badgeVariant: 'gov' as const,
+          badgeBg: 'bg-[#DD700B] text-white',
           icon: Monitor,
-          colorClass: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300',
-          gradientClass: 'from-sky-600/10 via-transparent to-transparent',
-          defaultAmenities: ['1 Gbps Fiber LAN', 'UPS Redundancy', 'Linux/Win Workstations', 'Smart Board'],
+          defaultAmenities: ['1 Gbps Fiber LAN', 'UPS Redundancy', 'AI Workstations', 'Smart Board'],
           defaultLocation: 'Science & IT Block, Floor 2',
         };
       case 'ground':
         return {
           label: 'Sports Ground',
-          badgeVariant: 'success' as const,
+          badgeBg: 'bg-[#ADACA7] text-[#1C1D1A]',
           icon: Trophy,
-          colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300',
-          gradientClass: 'from-emerald-600/10 via-transparent to-transparent',
           defaultAmenities: ['Floodlights (LED)', 'Natural Grass Turf', 'Covered Pavilion', 'Changing Rooms'],
           defaultLocation: 'East Campus Sports Complex',
         };
       default:
         return {
-          label: 'College Space',
-          badgeVariant: 'secondary' as const,
+          label: 'Facility',
+          badgeBg: 'bg-[#D9DADF] text-[#1C1D1A]',
           icon: Building,
-          colorClass: 'bg-slate-50 text-slate-700 border-slate-200',
-          gradientClass: 'from-slate-600/10 via-transparent to-transparent',
           defaultAmenities: ['Standard Seating', 'Ventilation', 'Restroom Access'],
           defaultLocation: 'College Campus',
         };
@@ -85,102 +68,91 @@ export function SpaceCard({
   const activeLocation = location || config.defaultLocation;
 
   return (
-    <Card className="group relative flex flex-col justify-between overflow-hidden border-slate-200 bg-white transition-all duration-300 hover:border-blue-400 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/90 rounded-2xl">
-      {/* Top subtle government asset status strip */}
-      <div className={`h-1.5 w-full bg-linear-to-r ${config.gradientClass} bg-slate-200 group-hover:bg-blue-600 transition-colors`} />
-
-      <div>
-        <CardHeader className="p-5 pb-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className={`inline-flex items-center justify-center p-2 rounded-xl border ${config.colorClass}`}>
-                <IconComponent className="h-5 w-5" />
-              </span>
-              <div>
-                <Badge variant={config.badgeVariant} className="text-[11px] font-semibold tracking-wide uppercase">
-                  {config.label}
-                </Badge>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Available</span>
-            </div>
+    <div className="group relative flex flex-col justify-between overflow-hidden bg-white border-2 border-[#1C1D1A] rounded-3xl shadow-[4px_4px_0px_0px_#1C1D1A] hover:shadow-[6px_6px_0px_0px_#DD700B] transition-all hover:-translate-y-1">
+      {/* Header Info */}
+      <div className="p-5 pb-3 space-y-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex items-center justify-center p-2 rounded-xl border-2 border-[#1C1D1A] ${config.badgeBg}`}>
+              <IconComponent className="h-4 w-4" />
+            </span>
+            <span className={`text-[10px] font-display font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-[#1C1D1A] ${config.badgeBg}`}>
+              {config.label}
+            </span>
           </div>
 
-          <CardTitle className="mt-3.5 text-lg font-bold tracking-tight text-slate-900 group-hover:text-blue-900 dark:text-slate-100 transition-colors">
-            {space.name}
-          </CardTitle>
+          <div className="flex items-center gap-1.5 rounded-full bg-[#FCF8D8] px-2.5 py-1 text-[10px] font-extrabold text-[#1C1D1A] border border-[#1C1D1A]">
+            <span className="h-2 w-2 rounded-full bg-[#DD700B] animate-pulse" />
+            <span>Available</span>
+          </div>
+        </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 dark:text-slate-400">
-            <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+        <div>
+          <h3 className="font-display font-extrabold text-lg text-[#1C1D1A] group-hover:text-[#DD700B] transition-colors leading-snug">
+            {space.name}
+          </h3>
+          <div className="flex items-center gap-1.5 text-xs text-[#7C7D75] font-semibold mt-1">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#DD700B]" />
             <span className="truncate">{activeLocation}</span>
           </div>
-        </CardHeader>
+        </div>
 
-        <CardContent className="px-5 py-2 space-y-4">
-          {/* Capacity Stat */}
-          <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3 border border-slate-100 dark:bg-slate-800/60 dark:border-slate-800">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-xs border border-slate-200/80 text-blue-900 dark:bg-slate-900 dark:border-slate-700">
-                <Users className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-[10px] font-medium uppercase text-slate-400">Max Capacity</p>
-                <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                  {space.capacity.toLocaleString()} Persons
-                </p>
-              </div>
+        {/* Capacity & Verification Bento Card */}
+        <div className="flex items-center justify-between rounded-2xl bg-[#FCF8D8] p-3 border-2 border-[#1C1D1A]">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#D9DADF] border border-[#1C1D1A] text-[#1C1D1A]">
+              <Users className="h-4 w-4 text-[#DD700B]" />
             </div>
-            <div className="text-right">
-              <p className="text-[10px] font-medium uppercase text-slate-400">Asset Verification</p>
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                <ShieldCheck className="h-3.5 w-3.5 text-blue-600" />
-                Gov Registered
+            <div>
+              <p className="text-[9px] font-extrabold uppercase text-[#7C7D75]">Max Capacity</p>
+              <p className="text-xs font-display font-extrabold text-[#1C1D1A]">
+                {space.capacity.toLocaleString()} Seats
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-[9px] font-extrabold uppercase text-[#7C7D75]">Asset Ledger</p>
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#1C1D1A]">
+              <ShieldCheck className="h-3 w-3 text-[#DD700B]" />
+              Verified
+            </span>
+          </div>
+        </div>
+
+        {/* Key Amenities */}
+        <div className="space-y-1.5 pt-1">
+          <p className="text-[10px] font-display font-extrabold uppercase tracking-wider text-[#7C7D75]">
+            Key Amenities
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {activeAmenities.map((amenity, idx) => (
+              <span
+                key={idx}
+                className="rounded-xl bg-[#D9DADF] px-2.5 py-0.5 text-[10px] font-bold text-[#1C1D1A] border border-[#1C1D1A]"
+              >
+                {amenity}
               </span>
-            </div>
+            ))}
           </div>
-
-          {/* Amenities Pills */}
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
-              Key Infrastructure
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {activeAmenities.map((amenity, idx) => (
-                <span
-                  key={idx}
-                  className="rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200/50"
-                >
-                  {amenity}
-                </span>
-              ))}
-            </div>
-          </div>
-        </CardContent>
+        </div>
       </div>
 
-      <CardFooter className="p-5 pt-3 border-t border-slate-100 dark:border-slate-800/80 mt-2 bg-slate-50/40 dark:bg-slate-900/40">
-        <div className="w-full flex items-center justify-between gap-3">
-          <div className="text-xs">
-            <span className="text-[10px] uppercase font-bold text-emerald-700 block">Tier 1 Quota</span>
-            <span className="text-slate-500 font-medium text-[11px]">Free for Verified NGOs</span>
-          </div>
-
-          {/* Task 1 Requirement: "Request Access" button */}
-          <Button
-            type="button"
-            variant="gov"
-            size="sm"
-            onClick={() => onRequestAccess(space)}
-            className="group/btn gap-1.5 shadow-sm hover:shadow transition-all font-semibold"
-          >
-            <span>Request Access</span>
-            <ArrowUpRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-          </Button>
+      {/* Footer CTA */}
+      <div className="p-4 pt-3 border-t-2 border-[#1C1D1A] bg-[#FCF8D8]/70 flex items-center justify-between gap-3">
+        <div className="text-xs">
+          <span className="text-[10px] uppercase font-extrabold text-[#DD700B] block">Tier 1 Quota</span>
+          <span className="text-[#7C7D75] font-semibold text-[10px]">₹0 Tariff for NGOs</span>
         </div>
-      </CardFooter>
-    </Card>
+
+        <button
+          type="button"
+          onClick={() => onRequestAccess(space)}
+          className="bg-[#DD700B] hover:bg-[#c96205] text-white font-display font-extrabold text-xs py-2 px-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center gap-1.5 transition-all hover:-translate-y-0.5 cursor-pointer"
+        >
+          <span>Request Access</span>
+          <ArrowUpRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
   );
 }

@@ -4,29 +4,18 @@ import * as React from 'react';
 import { SpaceCard } from '@/components/SpaceCard';
 import { BookingModal } from '@/components/BookingModal';
 import { Navbar } from '@/components/Navbar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { getSpaces } from '@/app/actions';
 import type { Space, SpaceType } from '@/types/database';
 import {
-  Landmark,
   Search,
-  Filter,
   ShieldCheck,
   Building,
   Monitor,
   Trophy,
-  SlidersHorizontal,
   CheckCircle2,
-  RefreshCw,
-  Clock,
-  Sparkles,
-  Info,
-  ExternalLink,
+  SlidersHorizontal,
 } from 'lucide-react';
 
-// Government College Spaces Catalog (Default Curated Seed)
 const DEFAULT_SPACES: Space[] = [
   {
     id: 'f1a23456-789a-4bcd-ef01-234567890001',
@@ -39,7 +28,7 @@ const DEFAULT_SPACES: Space[] = [
   },
   {
     id: 'f1a23456-789a-4bcd-ef01-234567890002',
-    name: 'Dr. APJ Abdul Kalam Advanced Computing & AI Lab',
+    name: 'Dr. APJ Abdul Kalam Advanced AI & Computing Lab',
     type: 'computer_lab',
     capacity: 140,
     is_active: true,
@@ -48,7 +37,7 @@ const DEFAULT_SPACES: Space[] = [
   },
   {
     id: 'f1a23456-789a-4bcd-ef01-234567890003',
-    name: 'Major Dhyan Chand Multi-Sport Complex & Pavilion',
+    name: 'Major Dhyan Chand Multi-Sport Complex',
     type: 'ground',
     capacity: 2200,
     is_active: true,
@@ -89,13 +78,11 @@ export default function DiscoverSpacesPage() {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [selectedSpace, setSelectedSpace] = React.useState<Space | null>(null);
 
-  // Search & Filter state
   const [searchQuery, setSearchQuery] = React.useState<string>('');
   const [selectedType, setSelectedType] = React.useState<'all' | SpaceType>('all');
   const [capacityFilter, setCapacityFilter] = React.useState<number>(0);
   const [recentBookingRef, setRecentBookingRef] = React.useState<string | null>(null);
 
-  // Fetch from server action
   React.useEffect(() => {
     let isMounted = true;
     async function loadSpaces() {
@@ -106,12 +93,11 @@ export default function DiscoverSpacesPage() {
           if (result.success && result.data && result.data.length > 0) {
             setSpaces(result.data);
           } else {
-            // Keep default catalog for seamless demonstration
             setSpaces(DEFAULT_SPACES);
           }
         }
-      } catch (err) {
-        console.warn('Using default spaces catalog:', err);
+      } catch {
+        // Fallback default catalog
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -122,7 +108,6 @@ export default function DiscoverSpacesPage() {
     };
   }, []);
 
-  // Filtered spaces
   const filteredSpaces = React.useMemo(() => {
     return spaces.filter((space) => {
       const matchesSearch =
@@ -139,103 +124,96 @@ export default function DiscoverSpacesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/70 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans">
+    <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] font-body selection:bg-[#DD700B] selection:text-white flex flex-col justify-between">
       <Navbar />
 
-      {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1 w-full">
         {/* Banner with Trust & Anti-Corruption SLA */}
-        <section className="relative overflow-hidden rounded-2xl bg-slate-900 p-6 sm:p-8 text-white shadow-lg border border-slate-800">
-          <div className="relative z-10 max-w-3xl space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-300 border border-blue-500/30">
-              <ShieldCheck className="h-3.5 w-3.5" />
+        <section className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] p-6 sm:p-8 space-y-4">
+          <div className="space-y-3 max-w-3xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-[#D9DADF] px-3.5 py-1.5 text-xs font-bold text-[#1C1D1A] border-2 border-[#1C1D1A]">
+              <span className="h-2 w-2 rounded-full bg-[#DD700B] animate-pulse" />
               <span>Public Asset Transparency Mandate • Zero Arbitrary Denials</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+            <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-[#1C1D1A] tracking-tight leading-tight">
               Fair Allocation of Government College Infrastructure
-            </h2>
-            <p className="text-sm text-slate-300 leading-relaxed max-w-2xl">
+            </h1>
+            <p className="text-sm sm:text-base text-[#1C1D1A]/85 font-medium leading-relaxed max-w-2xl">
               Discover and request access to vacant auditoriums, high-performance computing centers, and sports arenas. Tier 1 quota grants subsidized access to certified non-governmental community organizations.
             </p>
 
-            {/* Quick Metrics */}
+            {/* Quick Metrics Bento */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3">
-              <div className="rounded-xl bg-slate-800/80 p-3 border border-slate-700/60">
-                <p className="text-[10px] uppercase font-semibold text-slate-400">Listed Assets</p>
-                <p className="text-xl font-bold text-white">{spaces.length} Spaces</p>
+              <div className="rounded-2xl bg-[#FCF8D8] p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                <p className="text-[10px] uppercase font-extrabold text-[#7C7D75]">Listed Assets</p>
+                <p className="font-display text-xl font-extrabold text-[#1C1D1A]">{spaces.length} Spaces</p>
               </div>
-              <div className="rounded-xl bg-slate-800/80 p-3 border border-slate-700/60">
-                <p className="text-[10px] uppercase font-semibold text-emerald-400">NGO Quota</p>
-                <p className="text-xl font-bold text-emerald-300">70% Reserved</p>
+              <div className="rounded-2xl bg-[#DD700B] text-white p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                <p className="text-[10px] uppercase font-extrabold text-white/80">NGO Quota</p>
+                <p className="font-display text-xl font-extrabold text-white">70% Reserved</p>
               </div>
-              <div className="rounded-xl bg-slate-800/80 p-3 border border-slate-700/60">
-                <p className="text-[10px] uppercase font-semibold text-slate-400">Audit Status</p>
-                <p className="text-xl font-bold text-blue-300">100% Immutable</p>
+              <div className="rounded-2xl bg-[#7C7D75] text-[#FCF8D8] p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                <p className="text-[10px] uppercase font-extrabold text-[#D9DADF]">Audit Status</p>
+                <p className="font-display text-xl font-extrabold text-[#FCF8D8]">100% Sealed</p>
               </div>
-              <div className="rounded-xl bg-slate-800/80 p-3 border border-slate-700/60">
-                <p className="text-[10px] uppercase font-semibold text-slate-400">Response SLA</p>
-                <p className="text-xl font-bold text-amber-300">48h Max</p>
+              <div className="rounded-2xl bg-[#D9DADF] text-[#1C1D1A] p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                <p className="text-[10px] uppercase font-extrabold text-[#7C7D75]">Response SLA</p>
+                <p className="font-display text-xl font-extrabold text-[#1C1D1A]">48h Max</p>
               </div>
             </div>
           </div>
-
-          {/* Decorative government background watermark */}
-          <div className="absolute right-0 bottom-0 translate-x-12 translate-y-8 opacity-10 pointer-events-none">
-            <Landmark className="h-96 w-96 text-white" />
-          </div>
         </section>
 
-        {/* Recent Application Notice (if any) */}
+        {/* Application Notification Banner */}
         {recentBookingRef && (
-          <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-900 flex items-center justify-between shadow-xs">
+          <div className="rounded-2xl border-2 border-[#1C1D1A] bg-[#FCF8D8] p-4 text-[#1C1D1A] flex items-center justify-between shadow-[3px_3px_0px_0px_#1C1D1A]">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full bg-emerald-200 text-emerald-800 flex items-center justify-center font-bold">
+              <div className="h-8 w-8 rounded-xl bg-[#DD700B] text-white flex items-center justify-center font-bold border border-[#1C1D1A]">
                 <CheckCircle2 className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                <p className="text-[10px] font-display font-extrabold uppercase tracking-wider text-[#DD700B]">
                   Application In Progress
                 </p>
-                <p className="text-sm font-semibold">
+                <p className="text-xs sm:text-sm font-bold text-[#1C1D1A]">
                   Request Ref #{recentBookingRef} logged to official audit ledger. Status: PENDING REVIEW.
                 </p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
+            <button
+              type="button"
               onClick={() => setRecentBookingRef(null)}
-              className="text-xs border-emerald-300 bg-white hover:bg-emerald-100 text-emerald-900"
+              className="text-xs font-bold px-3 py-1 rounded-xl bg-white border border-[#1C1D1A] hover:bg-[#D9DADF] cursor-pointer"
             >
               Dismiss
-            </Button>
+            </button>
           </div>
         )}
 
         {/* Filter & Search Bar */}
         <section className="space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-xs dark:bg-slate-900 dark:border-slate-800">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-3xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A]">
             {/* Search Input */}
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#7C7D75]" />
+              <input
                 type="text"
                 placeholder="Search by facility name, space type, or campus block..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-11 border-slate-300 focus-visible:ring-blue-600 rounded-lg text-sm"
+                className="w-full pl-10 pr-4 h-11 bg-[#FCF8D8]/50 border-2 border-[#1C1D1A] rounded-2xl text-xs sm:text-sm font-semibold text-[#1C1D1A] placeholder:text-[#7C7D75] focus:outline-hidden focus:border-[#DD700B]"
               />
             </div>
 
             {/* Space Type Selector Tabs */}
-            <div className="flex flex-wrap items-center gap-1.5 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
+            <div className="flex flex-wrap items-center gap-1.5">
               <button
                 type="button"
                 onClick={() => setSelectedType('all')}
-                className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-2xl text-xs font-display font-extrabold transition-all border-2 border-[#1C1D1A] cursor-pointer ${
                   selectedType === 'all'
-                    ? 'bg-blue-900 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300'
+                    ? 'bg-[#DD700B] text-white shadow-[2px_2px_0px_0px_#1C1D1A]'
+                    : 'bg-white text-[#1C1D1A] hover:bg-[#D9DADF]'
                 }`}
               >
                 All Spaces ({spaces.length})
@@ -243,103 +221,79 @@ export default function DiscoverSpacesPage() {
               <button
                 type="button"
                 onClick={() => setSelectedType('auditorium')}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-display font-extrabold transition-all border-2 border-[#1C1D1A] cursor-pointer ${
                   selectedType === 'auditorium'
-                    ? 'bg-purple-900 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300'
+                    ? 'bg-[#7C7D75] text-[#FCF8D8] shadow-[2px_2px_0px_0px_#1C1D1A]'
+                    : 'bg-white text-[#1C1D1A] hover:bg-[#D9DADF]'
                 }`}
               >
                 <Building className="h-3.5 w-3.5" />
-                Auditoriums
+                <span>Auditoriums</span>
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedType('computer_lab')}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-display font-extrabold transition-all border-2 border-[#1C1D1A] cursor-pointer ${
                   selectedType === 'computer_lab'
-                    ? 'bg-sky-900 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300'
+                    ? 'bg-[#D9DADF] text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]'
+                    : 'bg-white text-[#1C1D1A] hover:bg-[#D9DADF]'
                 }`}
               >
-                <Monitor className="h-3.5 w-3.5" />
-                Computer Labs
+                <Monitor className="h-3.5 w-3.5 text-[#DD700B]" />
+                <span>Computer Labs</span>
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedType('ground')}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-display font-extrabold transition-all border-2 border-[#1C1D1A] cursor-pointer ${
                   selectedType === 'ground'
-                    ? 'bg-emerald-900 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300'
+                    ? 'bg-[#ADACA7] text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]'
+                    : 'bg-white text-[#1C1D1A] hover:bg-[#D9DADF]'
                 }`}
               >
-                <Trophy className="h-3.5 w-3.5" />
-                Sports Grounds
+                <Trophy className="h-3.5 w-3.5 text-[#DD700B]" />
+                <span>Sports Grounds</span>
               </button>
             </div>
           </div>
 
           {/* Secondary Filters Bar */}
-          <div className="flex flex-wrap items-center justify-between text-xs text-slate-600 gap-3 px-1">
+          <div className="flex flex-wrap items-center justify-between text-xs text-[#7C7D75] font-bold gap-3 px-1">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-500 uppercase tracking-wider text-[11px]">
+              <span className="font-display font-extrabold text-[10px] uppercase tracking-wider text-[#1C1D1A]">
                 Capacity Filter:
               </span>
-              <button
-                type="button"
-                onClick={() => setCapacityFilter(0)}
-                className={`px-2.5 py-1 rounded-md border text-[11px] cursor-pointer ${
-                  capacityFilter === 0
-                    ? 'bg-slate-900 text-white border-slate-900 font-bold'
-                    : 'border-slate-300 bg-white hover:bg-slate-50 text-slate-700'
-                }`}
-              >
-                Any Capacity
-              </button>
-              <button
-                type="button"
-                onClick={() => setCapacityFilter(100)}
-                className={`px-2.5 py-1 rounded-md border text-[11px] cursor-pointer ${
-                  capacityFilter === 100
-                    ? 'bg-slate-900 text-white border-slate-900 font-bold'
-                    : 'border-slate-300 bg-white hover:bg-slate-50 text-slate-700'
-                }`}
-              >
-                100+ Seats
-              </button>
-              <button
-                type="button"
-                onClick={() => setCapacityFilter(500)}
-                className={`px-2.5 py-1 rounded-md border text-[11px] cursor-pointer ${
-                  capacityFilter === 500
-                    ? 'bg-slate-900 text-white border-slate-900 font-bold'
-                    : 'border-slate-300 bg-white hover:bg-slate-50 text-slate-700'
-                }`}
-              >
-                500+ Seats
-              </button>
-              <button
-                type="button"
-                onClick={() => setCapacityFilter(1000)}
-                className={`px-2.5 py-1 rounded-md border text-[11px] cursor-pointer ${
-                  capacityFilter === 1000
-                    ? 'bg-slate-900 text-white border-slate-900 font-bold'
-                    : 'border-slate-300 bg-white hover:bg-slate-50 text-slate-700'
-                }`}
-              >
-                1,000+ Seats
-              </button>
+              {[
+                { label: 'Any Capacity', val: 0 },
+                { label: '100+ Seats', val: 100 },
+                { label: '500+ Seats', val: 500 },
+                { label: '1,000+ Seats', val: 1000 },
+              ].map((filter) => (
+                <button
+                  key={filter.val}
+                  type="button"
+                  onClick={() => setCapacityFilter(filter.val)}
+                  className={`px-3 py-1 rounded-xl border-2 border-[#1C1D1A] text-[11px] font-bold transition-all cursor-pointer ${
+                    capacityFilter === filter.val
+                      ? 'bg-[#1C1D1A] text-[#FCF8D8] shadow-[2px_2px_0px_0px_#7C7D75]'
+                      : 'bg-white text-[#1C1D1A] hover:bg-[#D9DADF]'
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
             </div>
 
             <div>
-              <span className="text-slate-500">
-                Displaying <strong>{filteredSpaces.length}</strong> of <strong>{spaces.length}</strong> available facilities
+              <span>
+                Displaying <strong className="text-[#1C1D1A]">{filteredSpaces.length}</strong> of{' '}
+                <strong className="text-[#1C1D1A]">{spaces.length}</strong> available facilities
               </span>
             </div>
           </div>
         </section>
 
-        {/* Task 1 Requirement: Grid of SpaceCards */}
+        {/* SpaceCards Grid */}
         <section>
           {filteredSpaces.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -353,31 +307,46 @@ export default function DiscoverSpacesPage() {
             </div>
           ) : (
             /* Empty State */
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center space-y-4">
-              <div className="mx-auto h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                <Search className="h-6 w-6" />
+            <div className="rounded-3xl border-2 border-dashed border-[#1C1D1A] bg-white p-12 text-center space-y-4 shadow-[4px_4px_0px_0px_#1C1D1A]">
+              <div className="mx-auto h-12 w-12 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] flex items-center justify-center text-[#1C1D1A]">
+                <Search className="h-6 w-6 text-[#DD700B]" />
               </div>
-              <h3 className="text-base font-bold text-slate-800">No Facilities Match Your Criteria</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              <h3 className="font-display font-extrabold text-base text-[#1C1D1A]">No Facilities Match Your Criteria</h3>
+              <p className="text-xs text-[#7C7D75] max-w-sm mx-auto font-medium">
                 Try loosening your search keywords or resetting the category and capacity filters.
               </p>
-              <Button
-                variant="outline"
-                size="sm"
+              <button
+                type="button"
                 onClick={() => {
                   setSearchQuery('');
                   setSelectedType('all');
                   setCapacityFilter(0);
                 }}
+                className="bg-[#DD700B] hover:bg-[#c96205] text-white font-display font-extrabold text-xs py-2 px-4 rounded-xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] cursor-pointer"
               >
                 Reset All Filters
-              </Button>
+              </button>
             </div>
           )}
         </section>
       </main>
 
-      {/* Task 2 Requirement: BookingModal Component */}
+      {/* Footer */}
+      <footer className="border-t-2 border-[#1C1D1A] bg-[#FCF8D8] py-8 px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-[#7C7D75]">
+          <div className="flex items-center gap-2">
+            <span className="font-display font-extrabold text-sm text-[#1C1D1A]">idlespaces.</span>
+            <span>• Fair Access & Institutional Asset Sharing Network</span>
+          </div>
+          <div className="flex items-center gap-4 text-[#1C1D1A]">
+            <span>Security Standard ISO/IEC 27001</span>
+            <span>•</span>
+            <span>Immutable Audit Trail Active</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* Booking Modal */}
       <BookingModal
         space={selectedSpace}
         isOpen={!!selectedSpace}

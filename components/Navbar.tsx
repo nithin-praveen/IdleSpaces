@@ -59,7 +59,7 @@ export function Navbar() {
           {/* Brand Mark */}
           <Link href="/" className="flex items-center gap-2 group shrink-0">
             <span className="font-display font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1C1D1A] group-hover:text-[#DD700B] transition-colors">
-              spaces.
+              idlespaces.
             </span>
             <span className="h-2.5 w-2.5 rounded-full bg-[#DD700B] animate-pulse" />
             <span className="hidden sm:inline-block text-[10px] font-display font-bold px-2 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] uppercase tracking-wider ml-1">

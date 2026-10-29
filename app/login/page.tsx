@@ -3,11 +3,6 @@
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import {
   evaluatePasswordStrength,
   DEMO_ACCOUNTS,
@@ -15,17 +10,16 @@ import {
 } from '@/lib/auth';
 import { useAuth } from '@/components/AuthProvider';
 import {
-  Landmark,
   ShieldCheck,
   Lock,
   Mail,
   Eye,
   EyeOff,
   AlertCircle,
-  CheckCircle2,
   ArrowRight,
   Clock,
   KeyRound,
+  ArrowUpRight,
 } from 'lucide-react';
 
 function LoginForm() {
@@ -43,21 +37,18 @@ function LoginForm() {
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [remainingLockout, setRemainingLockout] = React.useState<number>(0);
 
-  // Live password strength calculation
   const strength: PasswordStrengthResult = React.useMemo(() => {
     return evaluatePasswordStrength(password);
   }, [password]);
 
-  // Handle URL errors on load (e.g. from Proxy guard)
   React.useEffect(() => {
     if (errorParam === 'admin_required') {
-      setErrorMessage("Access Denied: The Dean's Audit Review requires verified Institutional Administrator privileges. Please authenticate as Admin.");
+      setErrorMessage("Access Denied: The Dean's Review requires verified Institutional Administrator privileges. Please authenticate as Admin.");
     } else if (errorParam === 'login_required') {
       setErrorMessage('Authentication Required: Please sign in with your verified institutional account to continue.');
     }
   }, [errorParam]);
 
-  // Lockout countdown timer
   React.useEffect(() => {
     if (remainingLockout <= 0) return;
     const interval = setInterval(() => {
@@ -105,60 +96,60 @@ function LoginForm() {
   };
 
   return (
-    <Card className="border-slate-300 shadow-xl bg-white overflow-hidden rounded-2xl">
+    <div className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] overflow-hidden">
       {/* Portal Switcher Banner */}
-      <div className="bg-slate-100 p-2 border-b border-slate-200 grid grid-cols-2 gap-1.5 text-xs font-semibold">
+      <div className="grid grid-cols-2 text-xs font-display font-extrabold border-b-2 border-[#1C1D1A]">
         <Link
           href="/user/login"
-          className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-white transition-all text-center"
+          className="flex items-center justify-center gap-1.5 py-3 px-3 bg-[#FCF8D8] text-[#1C1D1A] hover:bg-[#D9DADF] border-r-2 border-[#1C1D1A] transition-colors text-center cursor-pointer"
         >
           <span>👥 User & NGO Portal</span>
         </Link>
-        <div className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-blue-900 text-white shadow-xs text-center font-bold">
-          <ShieldCheck className="h-3.5 w-3.5 text-blue-300" />
+        <div className="flex items-center justify-center gap-1.5 py-3 px-3 bg-[#1C1D1A] text-[#FCF8D8] text-center">
+          <ShieldCheck className="h-3.5 w-3.5 text-[#DD700B]" />
           <span>🏛️ Dean / Admin SSO</span>
         </div>
       </div>
 
       {/* Header with Security Ribbon */}
-      <div className="bg-blue-900 px-6 py-5 text-white flex items-center justify-between">
+      <div className="bg-[#7C7D75] px-6 py-5 text-[#FCF8D8] border-b-2 border-[#1C1D1A] flex items-center justify-between">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-blue-800 text-blue-100 text-[10px] font-semibold uppercase tracking-wider mb-1">
-            <ShieldCheck className="h-3.5 w-3.5 text-blue-300" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] text-[10px] font-display font-extrabold uppercase tracking-wider mb-1.5 border border-[#FCF8D8]/20">
+            <ShieldCheck className="h-3 w-3 text-[#DD700B]" />
             <span>Statutory Security Gateway</span>
           </div>
-          <h2 className="text-xl font-bold tracking-tight">Institutional Login</h2>
-          <p className="text-xs text-blue-200 mt-0.5">
+          <h2 className="font-display font-extrabold text-2xl text-white tracking-tight">Institutional Login</h2>
+          <p className="text-xs text-[#D9DADF] mt-0.5 font-medium">
             Single Sign-On for College Authorities, NGOs & Corporates
           </p>
         </div>
-        <div className="h-12 w-12 rounded-full bg-blue-800/80 border border-blue-700/60 flex items-center justify-center text-blue-200 shrink-0">
-          <Lock className="h-6 w-6" />
+        <div className="h-11 w-11 rounded-2xl bg-[#1C1D1A] border-2 border-[#FCF8D8] flex items-center justify-center text-[#DD700B] shrink-0 shadow-[2px_2px_0px_0px_#FCF8D8]">
+          <Lock className="h-5 w-5" />
         </div>
       </div>
 
-      <CardContent className="p-6 space-y-5">
+      <div className="p-6 space-y-5">
         {/* Error & Lockout Alert */}
         {errorMessage && (
           <div
-            className={`p-3.5 rounded-xl text-xs flex items-start gap-2.5 border ${
+            className={`p-3.5 rounded-2xl text-xs flex items-start gap-2.5 border-2 border-[#1C1D1A] ${
               remainingLockout > 0
-                ? 'bg-red-50 border-red-200 text-red-900'
-                : 'bg-amber-50 border-amber-200 text-amber-900'
+                ? 'bg-[#DD700B] text-white shadow-[2px_2px_0px_0px_#1C1D1A]'
+                : 'bg-[#FCF8D8] text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]'
             }`}
           >
             {remainingLockout > 0 ? (
-              <Clock className="h-4 w-4 text-red-600 shrink-0 mt-0.5 animate-pulse" />
+              <Clock className="h-4 w-4 shrink-0 mt-0.5 animate-pulse" />
             ) : (
-              <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+              <AlertCircle className="h-4 w-4 text-[#DD700B] shrink-0 mt-0.5" />
             )}
-            <div className="space-y-1">
-              <p className="font-semibold">
+            <div className="space-y-0.5">
+              <p className="font-display font-extrabold">
                 {remainingLockout > 0
                   ? `Account Temporarily Locked (${remainingLockout}s)`
                   : 'Authentication Notice'}
               </p>
-              <p className="leading-relaxed">{errorMessage}</p>
+              <p className="font-medium leading-relaxed">{errorMessage}</p>
             </div>
           </div>
         )}
@@ -167,15 +158,15 @@ function LoginForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Field */}
           <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-xs font-semibold text-slate-700 flex items-center justify-between">
+            <label htmlFor="email" className="text-xs font-display font-extrabold text-[#1C1D1A] flex items-center justify-between">
               <span>Institutional Email Address</span>
-              <span className="text-[10px] text-slate-400 font-normal">gov.in / org / corporate</span>
-            </Label>
+              <span className="text-[10px] text-[#7C7D75] font-mono">gov.in / org / corporate</span>
+            </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#7C7D75]">
                 <Mail className="h-4 w-4" />
               </div>
-              <Input
+              <input
                 id="email"
                 type="email"
                 required
@@ -184,7 +175,7 @@ function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubmitting || remainingLockout > 0}
-                className="pl-9 text-xs sm:text-sm h-10 border-slate-300 focus:border-blue-900 focus:ring-blue-900"
+                className="w-full pl-10 pr-3.5 text-xs sm:text-sm h-11 bg-[#FCF8D8]/50 border-2 border-[#1C1D1A] rounded-2xl font-semibold text-[#1C1D1A] placeholder:text-[#7C7D75] focus:outline-hidden focus:border-[#DD700B]"
               />
             </div>
           </div>
@@ -192,16 +183,16 @@ function LoginForm() {
           {/* Password Field */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-xs font-semibold text-slate-700">
+              <label htmlFor="password" className="text-xs font-display font-extrabold text-[#1C1D1A]">
                 Password
-              </Label>
-              <span className="text-[10px] text-slate-400">Min. 8 characters</span>
+              </label>
+              <span className="text-[10px] text-[#7C7D75] font-semibold">Min. 8 characters</span>
             </div>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#7C7D75]">
                 <KeyRound className="h-4 w-4" />
               </div>
-              <Input
+              <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 required
@@ -210,13 +201,13 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isSubmitting || remainingLockout > 0}
-                className="pl-9 pr-10 text-xs sm:text-sm h-10 border-slate-300 focus:border-blue-900 focus:ring-blue-900"
+                className="w-full pl-10 pr-10 text-xs sm:text-sm h-11 bg-[#FCF8D8]/50 border-2 border-[#1C1D1A] rounded-2xl font-semibold text-[#1C1D1A] placeholder:text-[#7C7D75] focus:outline-hidden focus:border-[#DD700B]"
               />
               <button
                 type="button"
                 tabIndex={-1}
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-hidden"
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#7C7D75] hover:text-[#1C1D1A] cursor-pointer"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -227,41 +218,33 @@ function LoginForm() {
             {password.length > 0 && (
               <div className="pt-1.5 space-y-1.5">
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 font-medium">Password Strength:</span>
-                  <span
-                    className={`font-bold ${
-                      strength.score >= 3
-                        ? 'text-emerald-700'
-                        : strength.score === 2
-                        ? 'text-amber-700'
-                        : 'text-red-700'
-                    }`}
-                  >
+                  <span className="text-[#7C7D75] font-bold">Password Strength:</span>
+                  <span className="font-extrabold text-[#DD700B]">
                     {strength.label}
                   </span>
                 </div>
-                <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden flex gap-1">
+                <div className="h-2 w-full bg-[#D9DADF] rounded-full overflow-hidden flex gap-1 border border-[#1C1D1A]">
                   {[1, 2, 3, 4].map((step) => (
                     <div
                       key={step}
                       className={`h-full flex-1 transition-all duration-300 ${
-                        strength.score >= step ? strength.color : 'bg-transparent'
+                        strength.score >= step ? 'bg-[#DD700B]' : 'bg-transparent'
                       }`}
                     />
                   ))}
                 </div>
-                {/* Password Requirements Checklist */}
-                <div className="grid grid-cols-2 gap-1 text-[10px] text-slate-500 pt-0.5">
-                  <span className={`flex items-center gap-1 ${strength.hasMinLength ? 'text-emerald-700 font-semibold' : ''}`}>
+                {/* Requirements Checklist */}
+                <div className="grid grid-cols-2 gap-1 text-[10px] text-[#7C7D75] font-semibold pt-0.5">
+                  <span className={strength.hasMinLength ? 'text-[#1C1D1A] font-bold' : ''}>
                     {strength.hasMinLength ? '✓' : '•'} 8+ chars
                   </span>
-                  <span className={`flex items-center gap-1 ${strength.hasUppercase && strength.hasLowercase ? 'text-emerald-700 font-semibold' : ''}`}>
+                  <span className={strength.hasUppercase && strength.hasLowercase ? 'text-[#1C1D1A] font-bold' : ''}>
                     {strength.hasUppercase && strength.hasLowercase ? '✓' : '•'} Upper & lower
                   </span>
-                  <span className={`flex items-center gap-1 ${strength.hasNumber ? 'text-emerald-700 font-semibold' : ''}`}>
+                  <span className={strength.hasNumber ? 'text-[#1C1D1A] font-bold' : ''}>
                     {strength.hasNumber ? '✓' : '•'} 1+ number
                   </span>
-                  <span className={`flex items-center gap-1 ${strength.hasSpecial ? 'text-emerald-700 font-semibold' : ''}`}>
+                  <span className={strength.hasSpecial ? 'text-[#1C1D1A] font-bold' : ''}>
                     {strength.hasSpecial ? '✓' : '•'} 1+ special char
                   </span>
                 </div>
@@ -270,38 +253,38 @@ function LoginForm() {
           </div>
 
           {/* Submit Button */}
-          <Button
+          <button
             type="submit"
             disabled={isSubmitting || remainingLockout > 0}
-            className="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-2.5 h-11 text-xs sm:text-sm rounded-xl shadow-md transition-all gap-2"
+            className="w-full bg-[#DD700B] hover:bg-[#c96205] text-white font-display font-extrabold text-sm py-3 px-5 rounded-2xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
                 <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Verifying Credentials & Session...</span>
+                <span>Verifying Credentials...</span>
               </>
             ) : remainingLockout > 0 ? (
               <>
-                <Clock className="h-4 w-4 text-red-300" />
+                <Clock className="h-4 w-4" />
                 <span>Locked ({remainingLockout}s)</span>
               </>
             ) : (
               <>
-                <Lock className="h-4 w-4 text-blue-200" />
+                <Lock className="h-4 w-4" />
                 <span>Authenticate & Enter Portal</span>
               </>
             )}
-          </Button>
+          </button>
         </form>
 
         {/* Quick-Test / Evaluator Account Selector */}
-        <div className="pt-2 border-t border-slate-200 space-y-2.5">
-          <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600">
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="h-3.5 w-3.5 text-blue-700" />
+        <div className="pt-2 border-t-2 border-[#1C1D1A]/15 space-y-2.5">
+          <div className="flex items-center justify-between text-[11px] font-display font-extrabold text-[#1C1D1A]">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck className="h-3.5 w-3.5 text-[#DD700B]" />
               Quick Evaluation Accounts (1-Click Fill)
             </span>
-            <span className="text-[10px] text-blue-900 font-medium">Click to Load</span>
+            <span className="text-[10px] text-[#7C7D75]">Click to Load</span>
           </div>
 
           <div className="space-y-1.5">
@@ -312,25 +295,26 @@ function LoginForm() {
                   key={acc.id}
                   type="button"
                   onClick={() => handleQuickFill(acc)}
-                  className={`w-full text-left p-2.5 rounded-xl border text-xs transition-all flex items-center justify-between ${
+                  className={`w-full text-left p-2.5 rounded-2xl border-2 border-[#1C1D1A] text-xs transition-all flex items-center justify-between cursor-pointer ${
                     isSelected
-                      ? 'bg-blue-50/80 border-blue-400 ring-1 ring-blue-300'
-                      : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
+                      ? 'bg-[#DD700B] text-white shadow-[2px_2px_0px_0px_#1C1D1A]'
+                      : 'bg-[#FCF8D8] hover:bg-[#D9DADF] text-[#1C1D1A]'
                   }`}
                 >
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-slate-800">{acc.name.split(' (')[0]}</span>
-                      <Badge
-                        variant={acc.role === 'admin' ? 'gov' : acc.role === 'ngo' ? 'success' : 'outline'}
-                        className="text-[9px] uppercase font-bold px-1.5 py-0"
+                      <span className="font-display font-extrabold">{acc.name.split(' (')[0]}</span>
+                      <span
+                        className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md border border-[#1C1D1A] ${
+                          isSelected ? 'bg-white text-[#1C1D1A]' : 'bg-[#1C1D1A] text-[#FCF8D8]'
+                        }`}
                       >
                         {acc.role}
-                      </Badge>
+                      </span>
                     </div>
-                    <p className="text-[10px] text-slate-500 font-mono">{acc.email}</p>
+                    <p className={`text-[10px] font-mono ${isSelected ? 'text-white/80' : 'text-[#7C7D75]'}`}>{acc.email}</p>
                   </div>
-                  <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               );
             })}
@@ -338,86 +322,82 @@ function LoginForm() {
         </div>
 
         {/* Link to User & Community Portal */}
-        <div className="pt-3 border-t border-slate-200 text-center">
-          <p className="text-xs text-slate-600">
+        <div className="pt-3 border-t-2 border-[#1C1D1A]/15 text-center">
+          <p className="text-xs text-[#7C7D75] font-semibold">
             Booking as an NGO, Community Group, or Corporate?{' '}
             <Link
               href="/user/login"
-              className="font-bold text-blue-900 hover:text-blue-700 underline underline-offset-2 ml-1 inline-flex items-center gap-1"
+              className="font-extrabold text-[#DD700B] hover:underline underline-offset-2 ml-1 inline-flex items-center gap-1"
             >
               <span>Open User & NGO Login Portal</span>
               <ArrowRight className="h-3 w-3" />
             </Link>
           </p>
         </div>
-      </CardContent>
+      </div>
 
       {/* Statutory Security Footer */}
-      <CardFooter className="bg-slate-50 border-t border-slate-200 px-6 py-3.5 text-center flex flex-col gap-1.5">
-        <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] text-slate-500 font-medium">
+      <div className="bg-[#D9DADF] border-t-2 border-[#1C1D1A] px-6 py-3.5 text-center flex flex-col gap-1.5">
+        <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] text-[#1C1D1A] font-extrabold">
           <span className="flex items-center gap-1">
-            <ShieldCheck className="h-3 w-3 text-emerald-600" />
+            <ShieldCheck className="h-3 w-3 text-[#DD700B]" />
             256-Bit TLS Encryption
           </span>
           <span>•</span>
           <span className="flex items-center gap-1">
-            <Lock className="h-3 w-3 text-blue-600" />
+            <Lock className="h-3 w-3 text-[#1C1D1A]" />
             Statutory Audit Logged
           </span>
           <span>•</span>
           <span className="flex items-center gap-1">
-            <KeyRound className="h-3 w-3 text-amber-600" />
+            <KeyRound className="h-3 w-3 text-[#DD700B]" />
             Rate-Limit Protected
           </span>
         </div>
-        <p className="text-[9px] text-slate-400">
+        <p className="text-[9px] text-[#7C7D75] font-semibold">
           Authorized use only under the State College Infrastructure Oversight Guidelines.
         </p>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 flex flex-col justify-between font-sans">
-      {/* Official Government Top Bar */}
-      <header className="border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="h-10 w-10 rounded-xl bg-blue-900 flex items-center justify-center text-white shadow-xs group-hover:bg-blue-800 transition-colors">
-              <Landmark className="h-5 w-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-base text-slate-900 tracking-tight">IdleSpaces</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200 uppercase tracking-wider">
-                  Gov Portal
-                </span>
-              </div>
-              <p className="text-[10px] text-slate-500 font-medium hidden sm:block">
-                National Public Asset Allocation & Anti-Corruption Ledger
-              </p>
-            </div>
+    <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] font-body selection:bg-[#DD700B] selection:text-white flex flex-col justify-between">
+      {/* Official Top Bar */}
+      <header className="sticky top-0 z-40 bg-[#FCF8D8]/95 backdrop-blur-md border-b-2 border-[#1C1D1A] px-4 sm:px-6 lg:px-8 py-3.5">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2 group shrink-0">
+            <span className="font-display font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1C1D1A] group-hover:text-[#DD700B] transition-colors">
+              idlespaces.
+            </span>
+            <span className="h-2.5 w-2.5 rounded-full bg-[#DD700B] animate-pulse" />
+            <span className="hidden sm:inline-block text-[10px] font-display font-bold px-2 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] uppercase tracking-wider ml-1">
+              Public Portal
+            </span>
           </Link>
 
           <Link href="/discover">
-            <Button variant="ghost" size="sm" className="text-xs text-slate-600 gap-1.5">
+            <button
+              type="button"
+              className="bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-xs py-2 px-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center gap-1.5 transition-all hover:-translate-y-0.5 cursor-pointer"
+            >
               <span>View Catalog as Guest</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
+              <ArrowUpRight className="h-3.5 w-3.5 text-[#DD700B]" />
+            </button>
           </Link>
         </div>
       </header>
 
-      {/* Main Authentication Card wrapped in Suspense */}
+      {/* Main Authentication Card */}
       <main className="flex-1 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-6">
           <React.Suspense
             fallback={
-              <div className="p-8 bg-white rounded-2xl border border-slate-200 shadow-lg text-center space-y-3">
-                <div className="h-6 w-6 border-2 border-blue-900 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-xs text-slate-500">Loading Secure Institutional Gateway...</p>
+              <div className="p-8 bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] text-center space-y-3">
+                <div className="h-6 w-6 border-2 border-[#1C1D1A] border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-xs font-bold text-[#7C7D75]">Loading Institutional Gateway...</p>
               </div>
             }
           >
@@ -426,13 +406,16 @@ export default function LoginPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© 2026 IdleSpaces Platform • Ministry of Higher Education & Public Asset Stewardship</p>
-          <div className="flex items-center gap-4 text-slate-400 text-[11px]">
+      {/* Grounded Footer */}
+      <footer className="border-t-2 border-[#1C1D1A] bg-[#FCF8D8] py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold text-[#7C7D75]">
+          <div className="flex items-center gap-2">
+            <span className="font-display font-extrabold text-sm text-[#1C1D1A]">idlespaces.</span>
+            <span>• Ministry of Higher Education & Public Asset Stewardship</span>
+          </div>
+          <div className="flex items-center gap-4 text-[#1C1D1A]">
             <span>Security Standard ISO/IEC 27001</span>
-            <span>Privacy Policy</span>
+            <span>•</span>
             <span>Audit Ledger</span>
           </div>
         </div>

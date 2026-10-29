@@ -3,31 +3,20 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { ConditionReportModal } from '@/components/ConditionReportModal';
 import type { ReportPhase } from '@/types/database';
 import {
   CalendarCheck2,
   Camera,
   CheckCircle2,
-  Clock,
   ShieldCheck,
-  Building,
-  AlertTriangle,
-  ArrowRight,
-  ExternalLink,
   Lock,
-  Layers,
-  Sparkles,
+  ArrowRight,
   MapPin,
-  FileCheck2,
   Eye,
+  ArrowUpRight,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { useAuth } from '@/components/AuthProvider';
-import { LogIn } from 'lucide-react';
 
 interface UserBooking {
   id: string;
@@ -91,7 +80,6 @@ const INITIAL_USER_BOOKINGS: UserBooking[] = [
 export default function MyBookingsPage() {
   const [bookings, setBookings] = React.useState<UserBooking[]>(INITIAL_USER_BOOKINGS);
 
-  // Condition modal state
   const [modalConfig, setModalConfig] = React.useState<{
     isOpen: boolean;
     bookingId: string | null;
@@ -104,9 +92,8 @@ export default function MyBookingsPage() {
     phase: 'check-in',
   });
 
-  // Selected comparison view
   const [comparisonBooking, setComparisonBooking] = React.useState<UserBooking | null>(
-    INITIAL_USER_BOOKINGS[1]
+    INITIAL_USER_BOOKINGS.find((b) => b.checkInReport && b.checkOutReport) || null
   );
 
   const handleOpenConditionModal = (booking: UserBooking, phase: ReportPhase) => {
@@ -154,7 +141,6 @@ export default function MyBookingsPage() {
       })
     );
 
-    // Auto-update comparison if currently viewed
     const updated = bookings.find((b) => b.id === bookingId);
     if (updated) {
       setComparisonBooking(updated);
@@ -162,34 +148,34 @@ export default function MyBookingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] font-body selection:bg-[#DD700B] selection:text-white flex flex-col justify-between">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* NGO Header Banner */}
-        <section className="rounded-2xl bg-slate-900 p-6 sm:p-8 text-white border border-slate-800 shadow-md">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1 w-full">
+        {/* Header Banner */}
+        <section className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] p-6 sm:p-8 space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full bg-purple-500/20 px-3 py-1 text-xs font-semibold text-purple-300 border border-purple-500/30">
-                <Camera className="h-4 w-4" />
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#D9DADF] px-3.5 py-1.5 text-xs font-bold text-[#1C1D1A] border-2 border-[#1C1D1A]">
+                <Camera className="h-4 w-4 text-[#DD700B]" />
                 <span>Accountability Flow • Pre & Post Event Visual Proof</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-[#1C1D1A] tracking-tight leading-tight">
                 My Space Reservations & Inspection Ledger
               </h1>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#1C1D1A]/85 font-medium leading-relaxed">
                 Check-in before your event and submit post-event clean photos. Transparent photo evidence protects your organization and expedites immediate security deposit release.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60">
-              <div className="h-10 w-10 rounded-full bg-emerald-700 flex items-center justify-center font-bold text-white text-sm">
+            <div className="flex items-center gap-3 bg-[#FCF8D8] p-4 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+              <div className="h-10 w-10 rounded-xl bg-[#DD700B] text-white flex items-center justify-center font-display font-extrabold text-sm border border-[#1C1D1A]">
                 PE
               </div>
               <div>
-                <p className="text-xs font-bold text-white">Pratham Youth Initiative</p>
-                <div className="flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
-                  <ShieldCheck className="h-3 w-3" />
+                <p className="font-display font-extrabold text-xs text-[#1C1D1A]">Pratham Youth Initiative</p>
+                <div className="flex items-center gap-1 text-[10px] text-[#7C7D75] font-extrabold">
+                  <ShieldCheck className="h-3 w-3 text-[#DD700B]" />
                   <span>Tier 1 Verified NGO • 70% Quota Beneficiary</span>
                 </div>
               </div>
@@ -200,15 +186,18 @@ export default function MyBookingsPage() {
         {/* Active Reservations Grid */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <CalendarCheck2 className="h-5 w-5 text-blue-900" />
+            <h2 className="font-display font-extrabold text-xl text-[#1C1D1A] flex items-center gap-2">
+              <CalendarCheck2 className="h-5 w-5 text-[#DD700B]" />
               <span>Active Requisitions & Accountability Stages</span>
             </h2>
             <Link href="/discover">
-              <Button variant="outline" size="sm" className="text-xs gap-1.5">
+              <button
+                type="button"
+                className="bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-xs py-2 px-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center gap-1.5 transition-all hover:-translate-y-0.5 cursor-pointer"
+              >
                 <span>Request Another Facility</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
+                <ArrowRight className="h-3.5 w-3.5 text-[#DD700B]" />
+              </button>
             </Link>
           </div>
 
@@ -218,231 +207,221 @@ export default function MyBookingsPage() {
               const hasCheckOut = !!booking.checkOutReport;
 
               return (
-                <Card
+                <div
                   key={booking.id}
-                  className="rounded-2xl border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between"
+                  className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] overflow-hidden flex flex-col justify-between"
                 >
-                  <CardHeader className="p-5 pb-3">
+                  <div className="p-5 pb-3 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <div className="flex items-center gap-2">
-                          <Badge variant="gov" className="text-[10px] font-mono">
+                          <span className="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded-md bg-[#1C1D1A] text-[#FCF8D8] border border-[#1C1D1A]">
                             Ref: #{booking.id.substring(0, 8)}
-                          </Badge>
-                          <Badge variant="outline" className="capitalize text-[10px]">
+                          </span>
+                          <span className="text-[10px] font-display font-extrabold uppercase px-2 py-0.5 rounded-md bg-[#D9DADF] text-[#1C1D1A] border border-[#1C1D1A]">
                             {booking.spaceType.replace('_', ' ')}
-                          </Badge>
+                          </span>
                         </div>
-                        <CardTitle className="text-lg font-bold text-slate-900 mt-2">
+                        <h3 className="font-display font-extrabold text-lg text-[#1C1D1A] mt-2 leading-snug">
                           {booking.spaceName}
-                        </CardTitle>
-                        <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                          <MapPin className="h-3 w-3 text-slate-400" />
+                        </h3>
+                        <p className="text-xs text-[#7C7D75] font-semibold flex items-center gap-1 mt-0.5">
+                          <MapPin className="h-3 w-3 text-[#DD700B]" />
                           <span>{booking.location}</span>
                         </p>
                       </div>
 
                       <div>
                         {booking.status === 'approved' && (
-                          <Badge variant="success" className="text-xs px-2.5 py-1">
+                          <span className="text-xs font-display font-extrabold px-3 py-1 rounded-full bg-[#DD700B] text-white border border-[#1C1D1A]">
                             Approved
-                          </Badge>
+                          </span>
                         )}
                         {booking.status === 'completed' && (
-                          <Badge variant="secondary" className="text-xs px-2.5 py-1">
+                          <span className="text-xs font-display font-extrabold px-3 py-1 rounded-full bg-[#7C7D75] text-[#FCF8D8] border border-[#1C1D1A]">
                             Completed & Sealed
-                          </Badge>
+                          </span>
                         )}
                       </div>
                     </div>
-                  </CardHeader>
 
-                  <CardContent className="px-5 py-3 space-y-4 text-xs">
                     {/* Event Schedule Info */}
-                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3 border border-slate-200/80">
+                    <div className="flex items-center justify-between rounded-2xl bg-[#FCF8D8] p-3 border-2 border-[#1C1D1A]">
                       <div>
-                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Event Dates</span>
-                        <p className="font-bold text-slate-800 text-xs mt-0.5">
+                        <span className="text-[9px] font-extrabold uppercase text-[#7C7D75]">Event Dates</span>
+                        <p className="font-display font-extrabold text-xs text-[#1C1D1A] mt-0.5">
                           {booking.startDate} — {booking.endDate}
                         </p>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Security Deposit</span>
-                        <p className="font-bold text-emerald-800 text-xs mt-0.5">
+                        <span className="text-[9px] font-extrabold uppercase text-[#7C7D75]">Security Deposit</span>
+                        <p className="font-display font-extrabold text-xs text-[#DD700B] mt-0.5">
                           ₹{booking.securityDeposit.toLocaleString()} ({booking.depositStatus.toUpperCase()})
                         </p>
                       </div>
                     </div>
 
-                    {/* Step 3 3-Stage Progress Timeline */}
-                    <div className="space-y-2">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    {/* Progress Timeline */}
+                    <div className="space-y-2 pt-1">
+                      <p className="text-[10px] font-display font-extrabold uppercase tracking-wider text-[#7C7D75]">
                         Event Accountability Flow
                       </p>
-                      <div className="grid grid-cols-3 gap-2 text-center text-[11px]">
+                      <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-display font-extrabold">
                         {/* Stage 1: Allocation */}
-                        <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 font-semibold">
-                          <CheckCircle2 className="h-4 w-4 mx-auto text-emerald-600 mb-1" />
+                        <div className="p-2.5 rounded-xl bg-[#FCF8D8] border-2 border-[#1C1D1A] text-[#1C1D1A]">
+                          <CheckCircle2 className="h-4 w-4 mx-auto text-[#DD700B] mb-1" />
                           <span>Sanctioned</span>
                         </div>
 
                         {/* Stage 2: Pre-Check-in */}
                         <div
-                          className={`p-2 rounded-lg border font-semibold ${
+                          className={`p-2.5 rounded-xl border-2 border-[#1C1D1A] ${
                             hasCheckIn
-                              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                              : 'bg-amber-50 border-amber-300 text-amber-900 animate-pulse'
+                              ? 'bg-[#FCF8D8] text-[#1C1D1A]'
+                              : 'bg-[#DD700B] text-white animate-pulse'
                           }`}
                         >
                           {hasCheckIn ? (
-                            <CheckCircle2 className="h-4 w-4 mx-auto text-emerald-600 mb-1" />
+                            <CheckCircle2 className="h-4 w-4 mx-auto text-[#DD700B] mb-1" />
                           ) : (
-                            <Camera className="h-4 w-4 mx-auto text-amber-600 mb-1" />
+                            <Camera className="h-4 w-4 mx-auto text-white mb-1" />
                           )}
                           <span>{hasCheckIn ? 'Checked-In' : 'Check-In Due'}</span>
                         </div>
 
                         {/* Stage 3: Post-Check-out */}
                         <div
-                          className={`p-2 rounded-lg border font-semibold ${
+                          className={`p-2.5 rounded-xl border-2 border-[#1C1D1A] ${
                             hasCheckOut
-                              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                              ? 'bg-[#7C7D75] text-[#FCF8D8]'
                               : hasCheckIn
-                              ? 'bg-blue-50 border-blue-200 text-blue-900'
-                              : 'bg-slate-100 border-slate-200 text-slate-400'
+                              ? 'bg-[#D9DADF] text-[#1C1D1A]'
+                              : 'bg-white text-[#7C7D75]'
                           }`}
                         >
                           {hasCheckOut ? (
-                            <CheckCircle2 className="h-4 w-4 mx-auto text-emerald-600 mb-1" />
+                            <CheckCircle2 className="h-4 w-4 mx-auto text-[#FCF8D8] mb-1" />
                           ) : (
-                            <Lock className="h-4 w-4 mx-auto text-slate-400 mb-1" />
+                            <Lock className="h-4 w-4 mx-auto text-[#7C7D75] mb-1" />
                           )}
                           <span>{hasCheckOut ? 'Checked-Out' : 'Check-Out'}</span>
                         </div>
                       </div>
                     </div>
-                  </CardContent>
+                  </div>
 
-                  <CardFooter className="p-5 pt-3 border-t border-slate-100 bg-slate-50/50 flex flex-wrap items-center justify-between gap-2">
-                    {/* Check In Action */}
+                  {/* Actions */}
+                  <div className="p-4 pt-3 border-t-2 border-[#1C1D1A] bg-[#FCF8D8]/70 flex flex-wrap items-center justify-between gap-2">
                     {!hasCheckIn && (
-                      <Button
+                      <button
                         type="button"
-                        variant="gov"
-                        size="sm"
                         onClick={() => handleOpenConditionModal(booking, 'check-in')}
-                        className="w-full gap-2 font-semibold shadow-xs"
+                        className="w-full bg-[#DD700B] hover:bg-[#c96205] text-white font-display font-extrabold text-xs py-2.5 px-4 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center justify-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5"
                       >
                         <Camera className="h-4 w-4" />
                         <span>Perform Pre-Event Check-In (Photo Proof)</span>
-                      </Button>
+                      </button>
                     )}
 
-                    {/* Check Out Action */}
                     {hasCheckIn && !hasCheckOut && (
-                      <Button
+                      <button
                         type="button"
-                        variant="gov"
-                        size="sm"
                         onClick={() => handleOpenConditionModal(booking, 'check-out')}
-                        className="w-full gap-2 bg-purple-900 hover:bg-purple-800 text-white font-semibold shadow-xs"
+                        className="w-full bg-[#7C7D75] hover:bg-[#686962] text-[#FCF8D8] font-display font-extrabold text-xs py-2.5 px-4 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center justify-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5"
                       >
-                        <CheckCircle2 className="h-4 w-4" />
+                        <CheckCircle2 className="h-4 w-4 text-[#DD700B]" />
                         <span>Perform Post-Event Check-Out & Refund Deposit</span>
-                      </Button>
+                      </button>
                     )}
 
-                    {/* Both Complete */}
                     {hasCheckIn && hasCheckOut && (
-                      <Button
+                      <button
                         type="button"
-                        variant="outline"
-                        size="sm"
                         onClick={() => setComparisonBooking(booking)}
-                        className="w-full gap-2 text-xs font-semibold border-emerald-300 bg-emerald-50 text-emerald-950 hover:bg-emerald-100"
+                        className="w-full bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-xs py-2.5 px-4 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center justify-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5"
                       >
-                        <Eye className="h-4 w-4 text-emerald-700" />
+                        <Eye className="h-4 w-4 text-[#DD700B]" />
                         <span>View Inspection Proof (Before vs. After)</span>
-                      </Button>
+                      </button>
                     )}
-                  </CardFooter>
-                </Card>
+                  </div>
+                </div>
               );
             })}
           </div>
         </section>
 
-        {/* Standout UI Feature: Before vs. After Photo Comparison */}
+        {/* Before vs. After Photo Comparison */}
         {comparisonBooking && comparisonBooking.checkInReport && comparisonBooking.checkOutReport && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <ShieldCheck className="h-5 w-5 text-emerald-600" />
+                <h2 className="font-display font-extrabold text-lg text-[#1C1D1A] flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-[#DD700B]" />
                   <span>Audited Condition Proof: {comparisonBooking.spaceName}</span>
                 </h2>
-                <p className="text-xs text-slate-500">
-                  Side-by-side photographic record verified by the College Caretaker. Prevents arbitrary damage claims.
+                <p className="text-xs text-[#7C7D75] font-semibold">
+                  Side-by-side photographic record verified by the College Authority. Prevents arbitrary damage claims.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <Badge variant="success" className="text-xs">
+                <span className="text-[10px] font-display font-extrabold uppercase px-2.5 py-1 rounded-full bg-[#FCF8D8] text-[#1C1D1A] border border-[#1C1D1A]">
                   Zero Damage Certified
-                </Badge>
-                <Badge variant="outline" className="text-xs text-emerald-800 bg-emerald-50">
+                </span>
+                <span className="text-[10px] font-display font-extrabold uppercase px-2.5 py-1 rounded-full bg-[#DD700B] text-white border border-[#1C1D1A]">
                   Deposit 100% Refunded
-                </Badge>
+                </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-              {/* BEFORE PHOTO (Check-In) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-3xl border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A]">
+              {/* Check-In Photo */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  <span className="text-[10px] font-display font-extrabold uppercase tracking-wider text-[#1C1D1A] bg-[#FCF8D8] px-2.5 py-0.5 rounded-full border border-[#1C1D1A]">
                     Phase 1: Pre-Event Baseline (Check-In)
                   </span>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-[#7C7D75] font-mono">
                     {format(new Date(comparisonBooking.checkInReport.timestamp), 'dd MMM, hh:mm a')}
                   </span>
                 </div>
-                <div className="rounded-xl overflow-hidden border border-slate-200 h-64 bg-slate-900 relative shadow-inner">
+                <div className="rounded-2xl overflow-hidden border-2 border-[#1C1D1A] h-64 bg-[#1C1D1A] relative shadow-inner">
                   <img
                     src={comparisonBooking.checkInReport.photoUrl}
                     alt="Pre-Event Baseline"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-xs text-white text-[10px] px-2 py-1 rounded">
+                  <div className="absolute bottom-2 left-2 bg-[#1C1D1A]/80 backdrop-blur-xs text-[#FCF8D8] font-bold text-[10px] px-2.5 py-1 rounded-xl border border-white/20">
                     Verified Clean State Baseline
                   </div>
                 </div>
-                <p className="text-xs text-slate-600 italic bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                <p className="text-xs text-[#1C1D1A] italic bg-[#FCF8D8] p-3 rounded-2xl border border-[#1C1D1A]">
                   &ldquo;{comparisonBooking.checkInReport.notes}&rdquo;
                 </p>
               </div>
 
-              {/* AFTER PHOTO (Check-Out) */}
+              {/* Check-Out Photo */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  <span className="text-[10px] font-display font-extrabold uppercase tracking-wider text-white bg-[#DD700B] px-2.5 py-0.5 rounded-full border border-[#1C1D1A]">
                     Phase 2: Post-Event Handover (Check-Out)
                   </span>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-[#7C7D75] font-mono">
                     {format(new Date(comparisonBooking.checkOutReport.timestamp), 'dd MMM, hh:mm a')}
                   </span>
                 </div>
-                <div className="rounded-xl overflow-hidden border border-slate-200 h-64 bg-slate-900 relative shadow-inner">
+                <div className="rounded-2xl overflow-hidden border-2 border-[#1C1D1A] h-64 bg-[#1C1D1A] relative shadow-inner">
                   <img
                     src={comparisonBooking.checkOutReport.photoUrl}
                     alt="Post-Event Handover"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute bottom-2 left-2 bg-emerald-900/90 backdrop-blur-xs text-white text-[10px] px-2 py-1 rounded">
+                  <div className="absolute bottom-2 left-2 bg-[#DD700B] text-white font-bold text-[10px] px-2.5 py-1 rounded-xl border border-white/20">
                     Clean Handover Verified
                   </div>
                 </div>
-                <p className="text-xs text-slate-600 italic bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                <p className="text-xs text-[#1C1D1A] italic bg-[#FCF8D8] p-3 rounded-2xl border border-[#1C1D1A]">
                   &ldquo;{comparisonBooking.checkOutReport.notes}&rdquo;
                 </p>
               </div>
@@ -450,6 +429,18 @@ export default function MyBookingsPage() {
           </section>
         )}
       </main>
+
+      <footer className="border-t-2 border-[#1C1D1A] bg-[#FCF8D8] py-8 px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-[#7C7D75]">
+          <div className="flex items-center gap-2">
+            <span className="font-display font-extrabold text-sm text-[#1C1D1A]">idlespaces.</span>
+            <span>• Fair Access & Visual Photo Proof System</span>
+          </div>
+          <div className="flex items-center gap-4 text-[#1C1D1A]">
+            <span>Audit Ledger Sealed</span>
+          </div>
+        </div>
+      </footer>
 
       {/* Modal for Check-In / Check-Out Photo Upload */}
       <ConditionReportModal
