@@ -1,0 +1,19 @@
+name: Sync Fork with Upstream
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' # Automatically checks and syncs every 30 minutes
+  workflow_dispatch: # Allows 1-click manual trigger from the Actions tab anytime
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync upstream repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh repo sync ${{ github.repository }} -b main
