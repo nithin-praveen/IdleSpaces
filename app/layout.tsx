@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "spaces. • Frozen Mist Neo-Memphis Bento Asset Gateway",
+  title: "idlespaces. • Institutional Asset Sharing Network",
   description: "Fair allocation of government college auditoriums, labs, and sports complexes for community good. Replicating the high-contrast Neo-Memphis Bento aesthetic with the Frozen Mist palette.",
 };
 
@@ -22,6 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#FCF8D8] text-[#1C1D1A]">
