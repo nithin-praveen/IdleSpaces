@@ -320,3 +320,15 @@ CREATE POLICY "Booking owners or admins can submit condition reports"
             WHERE b.id = condition_reports.booking_id AND b.user_id = auth.uid()
         )
     );
+
+
+-- ==============================================================================
+-- 6. SEED DATA: College Public Assets Catalog
+-- ==============================================================================
+INSERT INTO public.spaces (id, name, type, capacity, is_active) VALUES
+    ('f1a23456-789a-4bcd-ef01-234567890001', 'Sardar Vallabhbhai Patel Central Auditorium', 'auditorium', 750, true),
+    ('f1a23456-789a-4bcd-ef01-234567890002', 'Dr. APJ Abdul Kalam Advanced Computing & AI Lab', 'computer_lab', 140, true),
+    ('f1a23456-789a-4bcd-ef01-234567890003', 'Major Dhyan Chand Multi-Sport Complex & Pavilion', 'ground', 2200, true),
+    ('f1a23456-789a-4bcd-ef01-234567890004', 'Rabindranath Tagore Cultural & Performing Arts Hall', 'auditorium', 450, true),
+    ('f1a23456-789a-4bcd-ef01-234567890005', 'Srinivasa Ramanujan Computational Data Center', 'computer_lab', 90, true)
+ON CONFLICT (id) DO NOTHING;
