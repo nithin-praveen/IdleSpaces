@@ -27,7 +27,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const { login, user } = useAuth();
 
-  const redirectTarget = searchParams.get('redirect') || (user?.role === 'admin' ? '/admin' : '/discover');
+  const redirectTarget = searchParams.get('redirect') || '/admin';
   const errorParam = searchParams.get('error');
 
   const [email, setEmail] = React.useState('');
@@ -271,7 +271,7 @@ function LoginForm() {
             ) : (
               <>
                 <Lock className="h-4 w-4" />
-                <span>Authenticate & Enter Portal</span>
+                <span>Authenticate & Enter Dean Portal</span>
               </>
             )}
           </button>
@@ -374,7 +374,7 @@ export default function LoginPage() {
             </span>
             <span className="h-2.5 w-2.5 rounded-full bg-[#DD700B] animate-pulse" />
             <span className="hidden sm:inline-block text-[10px] font-display font-bold px-2 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] uppercase tracking-wider ml-1">
-              Public Portal
+              Dean Gateway
             </span>
           </Link>
 

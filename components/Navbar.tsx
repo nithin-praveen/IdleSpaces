@@ -50,8 +50,8 @@ export function Navbar() {
       name: 'Dean Review',
       href: '/admin',
       icon: ShieldCheck,
-      activeColor: 'bg-[#7C7D75] text-[#FCF8D8]',
-      requiresAdmin: true,
+      activeColor: 'bg-[#1C1D1A] text-[#FCF8D8]',
+      requiresAdmin: false,
     },
     {
       name: 'Check-In Proof',
@@ -81,7 +81,6 @@ export function Navbar() {
               const isActive =
                 pathname === link.href ||
                 (link.href !== '/' && pathname.startsWith(link.href));
-              const isLockedForUser = link.requiresAdmin && user?.role !== 'admin';
 
               return (
                 <Link key={link.href} href={link.href}>
@@ -94,9 +93,6 @@ export function Navbar() {
                   >
                     <Icon className="h-3.5 w-3.5 shrink-0" />
                     <span>{link.name}</span>
-                    {isLockedForUser && (
-                      <Lock className="h-3 w-3 text-[#DD700B] shrink-0" />
-                    )}
                   </div>
                 </Link>
               );
@@ -237,7 +233,7 @@ export function Navbar() {
                     <span>User Login</span>
                   </button>
                 </Link>
-                <Link href="/login" className="hidden sm:block">
+                <Link href="/login?redirect=/admin" className="hidden sm:block">
                   <button
                     type="button"
                     className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-1.5 px-3 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#7C7D75] flex items-center gap-1.5 cursor-pointer transition-all hover:-translate-y-0.5"

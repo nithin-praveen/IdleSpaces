@@ -108,7 +108,7 @@ export default function CalmIdleSpacesHome() {
           </Link>
 
           {/* Navigation to Separate Pages */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-display font-bold text-[#1C1D1A]">
+          <nav className="hidden md:flex items-center gap-5 lg:gap-6 text-xs font-display font-bold text-[#1C1D1A]">
             <Link
               href="/discover"
               className="hover:text-[#DD700B] transition-colors py-1 flex items-center gap-1"
@@ -130,23 +130,48 @@ export default function CalmIdleSpacesHome() {
             >
               About
             </Link>
+
+            {/* Always visible or highlighted Dean Review link */}
+            <Link
+              href="/admin"
+              className={`py-1.5 px-3 rounded-2xl border-2 transition-all flex items-center gap-1.5 cursor-pointer ${
+                user?.role === 'admin'
+                  ? 'bg-[#1C1D1A] text-[#FCF8D8] border-[#1C1D1A] shadow-[2px_2px_0px_0px_#DD700B]'
+                  : 'hover:border-[#1C1D1A] hover:bg-[#D9DADF] text-[#1C1D1A] border-transparent'
+              }`}
+            >
+              <ShieldCheck className="h-3.5 w-3.5 text-[#DD700B]" />
+              <span>Dean Review</span>
+              <span className="px-1.5 py-0.2 rounded-md bg-[#DD700B] text-white text-[9px] font-extrabold">
+                4
+              </span>
+            </Link>
           </nav>
 
           {/* Top Right: User Login & Dean SSO */}
           <div className="flex items-center gap-2">
             {user ? (
-              <div className="flex items-center gap-2 bg-[#D9DADF] p-1 sm:px-3 sm:py-1 rounded-2xl border-2 border-[#1C1D1A]">
-                <div className="h-6 w-6 rounded-full bg-[#1C1D1A] text-[#FCF8D8] flex items-center justify-center font-bold text-[10px]">
-                  {user.role === 'admin' ? 'AD' : user.role === 'ngo' ? 'NG' : 'CP'}
-                </div>
-                <div className="hidden sm:block text-left leading-none">
-                  <span className="text-xs font-bold text-[#1C1D1A] block">{user.name.split(' ')[0]}</span>
-                  <span className="text-[9px] font-extrabold uppercase text-[#7C7D75]">{user.role}</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={user.role === 'admin' ? '/admin' : '/discover'}
+                  className="flex items-center gap-2 bg-[#D9DADF] hover:bg-[#c7c9cf] p-1 sm:px-3 sm:py-1 rounded-2xl border-2 border-[#1C1D1A] transition-colors cursor-pointer"
+                  title="Go to Dashboard"
+                >
+                  <div className="h-6 w-6 rounded-full bg-[#1C1D1A] text-[#FCF8D8] flex items-center justify-center font-bold text-[10px]">
+                    {user.role === 'admin' ? 'AD' : user.role === 'ngo' ? 'NG' : 'CP'}
+                  </div>
+                  <div className="hidden sm:block text-left leading-none">
+                    <span className="text-xs font-bold text-[#1C1D1A] block">{user.name.split(' ')[0]}</span>
+                    <span className="text-[9px] font-extrabold uppercase text-[#7C7D75]">
+                      {user.role === 'admin' ? 'DEAN ADMIN' : user.role}
+                    </span>
+                  </div>
+                </Link>
+
                 <button
                   type="button"
                   onClick={() => logout()}
-                  className="p-1 rounded-lg hover:bg-black/10 text-[#1C1D1A] transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-white hover:bg-[#D9DADF] border-2 border-[#1C1D1A] text-[#1C1D1A] transition-colors cursor-pointer"
                   title="Sign Out"
                 >
                   <LogOut className="h-3.5 w-3.5" />
@@ -163,7 +188,7 @@ export default function CalmIdleSpacesHome() {
                     <span>USER LOGIN</span>
                   </button>
                 </Link>
-                <Link href="/login" className="hidden sm:block">
+                <Link href="/login?redirect=/admin" className="hidden sm:block">
                   <button
                     type="button"
                     className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-2 px-3 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#7C7D75] flex items-center gap-1.5 cursor-pointer transition-all hover:-translate-y-0.5"
@@ -178,11 +203,11 @@ export default function CalmIdleSpacesHome() {
         </div>
       </header>
 
-      {/* ── CALM & RELAXED HERO SECTION ─────────────────────────────────── */}
+      {/* ── CALM & RELAXED HERO SECTION (BIGGER PROPORTIONED PICTURE) ───── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-24 flex-1">
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           {/* Left Column: Clean Editorial Typography & CTAs */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-6 space-y-6">
             <h1 className="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-[#1C1D1A] tracking-tight leading-[1.05]">
               Unlock <br className="hidden sm:inline" />
               underused spaces <br className="hidden sm:inline" />
@@ -232,12 +257,12 @@ export default function CalmIdleSpacesHome() {
             </div>
           </div>
 
-          {/* Right Column: Clean doodle placed directly on the page */}
-          <div className="lg:col-span-5 flex items-center justify-center lg:justify-end">
+          {/* Right Column: Clean doodle placed directly on page (Prominent & Generous Scale) */}
+          <div className="lg:col-span-6 flex items-center justify-center lg:justify-end">
             <img
               src="/hero-doodle-clean.png"
               alt="Institutional Space and Equipment Sharing Network"
-              className="w-full max-w-xl h-auto object-contain select-none pointer-events-none"
+              className="w-full max-w-2xl lg:max-w-none lg:scale-115 h-auto object-contain select-none pointer-events-none transform transition-transform"
             />
           </div>
         </section>
@@ -679,6 +704,7 @@ export default function CalmIdleSpacesHome() {
 
           <div className="flex items-center gap-4 text-[#1C1D1A]">
             <Link href="/discover" className="hover:text-[#DD700B] transition-colors">Catalog</Link>
+            <Link href="/admin" className="hover:text-[#DD700B] transition-colors">Dean Review</Link>
             <Link href="/how-it-works" className="hover:text-[#DD700B] transition-colors">How It Works</Link>
             <Link href="/about" className="hover:text-[#DD700B] transition-colors">About</Link>
             <Link href="/user/login" className="hover:text-[#DD700B] transition-colors">User Portal</Link>

@@ -3,9 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AdminRejectModal } from '@/components/AdminRejectModal';
 import { AuditTimeline, type AuditTimelineItem } from '@/components/AuditTimeline';
 import { updateBookingStatus } from '@/app/actions';
@@ -28,7 +26,6 @@ import {
   FileText,
   AlertTriangle,
   Lock,
-  ExternalLink,
   Users,
   Search,
   Filter,
@@ -39,6 +36,8 @@ import {
   KeyRound,
   LogIn,
   Activity,
+  ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -176,10 +175,10 @@ export default function AdminPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+      <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] flex flex-col font-body">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <div className="flex items-center gap-3 text-slate-500 text-sm">
+          <div className="flex items-center gap-3 p-6 bg-white border-2 border-[#1C1D1A] rounded-2xl shadow-[3px_3px_0px_0px_#1C1D1A] text-[#1C1D1A] text-xs font-bold">
             <div className="h-5 w-5 border-2 border-[#DD700B] border-t-transparent rounded-full animate-spin" />
             <span>Verifying Institutional Administrator credentials...</span>
           </div>
@@ -193,49 +192,54 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] font-body selection:bg-[#DD700B] selection:text-white flex flex-col justify-between">
         <Navbar />
-        <main className="flex-1 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-2xl border border-red-200 shadow-xl overflow-hidden text-center p-8 space-y-6">
-            <div className="h-16 w-16 bg-red-100 text-red-700 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+        <main className="flex-1 flex items-center justify-center p-4 py-12">
+          <div className="max-w-lg w-full bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[6px_6px_0px_0px_#1C1D1A] overflow-hidden p-6 sm:p-8 space-y-6">
+            <div className="h-16 w-16 bg-[#FCF8D8] border-2 border-[#1C1D1A] text-[#DD700B] rounded-2xl flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#1C1D1A]">
               <ShieldAlert className="h-8 w-8" />
             </div>
 
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-100 text-red-900 text-xs font-semibold">
-                <span>Statutory 403 Forbidden</span>
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1C1D1A] text-[#FCF8D8] text-[10px] font-display font-extrabold uppercase tracking-wider">
+                <Lock className="h-3 w-3 text-[#DD700B]" />
+                <span>Statutory 403 • Authority Required</span>
               </div>
-              <h1 className="text-xl font-bold text-slate-900">
+              <h1 className="text-2xl font-display font-extrabold text-[#1C1D1A] tracking-tight">
                 Institutional Admin Access Required
               </h1>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                The Dean Administrative Console contains sensitive statutory sanctioning controls and the immutable ledger. Current session ({user ? `${user.role.toUpperCase()} - ${user.name}` : 'Unauthenticated'}) does not have Dean Authority.
+              <p className="text-xs text-[#7C7D75] font-semibold leading-relaxed max-w-sm mx-auto">
+                The Dean Administrative Console contains statutory sanctioning controls and the immutable audit ledger.
+                Current session: <strong>{user ? `${user.role.toUpperCase()} • ${user.name}` : 'Not Signed In'}</strong>.
               </p>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-left space-y-2 text-xs">
-              <p className="font-semibold text-slate-700 flex items-center gap-1.5">
-                <Lock className="h-3.5 w-3.5 text-[#1C1D1A]" />
-                Required Role: Institutional Administrator
+            <div className="bg-[#FCF8D8] p-4 rounded-2xl border-2 border-[#1C1D1A] text-left space-y-1.5 text-xs">
+              <p className="font-display font-extrabold text-[#1C1D1A] flex items-center gap-1.5">
+                <ShieldCheck className="h-4 w-4 text-[#DD700B]" />
+                <span>Instant Dean Evaluation Mode</span>
               </p>
-              <p className="text-slate-500 text-[11px] leading-relaxed">
-                Log in with verified college credentials or use the demonstration switcher below to inspect the Dean's review console.
+              <p className="text-[#7C7D75] text-[11px] font-medium leading-relaxed">
+                Click below to instantly authenticate as <strong>Dr. Rameshwar Sharma (Dean of Academic Infrastructure)</strong> and review incoming NGO space requisitions.
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 pt-2">
+            <div className="flex flex-col gap-2.5 pt-1">
               <button
                 type="button"
                 onClick={() => switchDemoRole('admin')}
-                className="w-full bg-[#DD700B] hover:bg-[#c96205] text-white font-semibold py-2.5 px-4 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-2"
+                className="w-full bg-[#DD700B] hover:bg-[#c96205] text-white font-display font-extrabold py-3 px-4 rounded-2xl text-xs border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <ShieldCheck className="h-4 w-4" />
-                <span>Switch to Dean / Admin Account (1-Click Demo)</span>
+                <span>Switch to Dean Account (Dr. Rameshwar Sharma)</span>
               </button>
 
               <Link href="/login?redirect=/admin" className="w-full">
-                <Button variant="outline" size="sm" className="w-full text-xs border-slate-300">
-                  <LogIn className="h-3.5 w-3.5 mr-1.5" />
-                  <span>Go to Login Page</span>
-                </Button>
+                <button
+                  type="button"
+                  className="w-full bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-bold py-2.5 px-4 rounded-2xl text-xs border-2 border-[#1C1D1A] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <LogIn className="h-3.5 w-3.5 text-[#DD700B]" />
+                  <span>Go to Dean SSO Sign-In Page</span>
+                </button>
               </Link>
             </div>
           </div>
@@ -252,7 +256,6 @@ export default function AdminPage() {
       booking.applicantRole === 'ngo' ? 'Tier 1 Statutory Community Quota' : 'Tier 2 Corporate Reservation'
     }. Verified by Dean of Academic Infrastructure.`;
 
-    // Attempt real server action
     try {
       await updateBookingStatus(
         booking.id,
@@ -261,7 +264,7 @@ export default function AdminPage() {
         statutoryReason
       );
     } catch {
-      // In offline / preview sandbox mode, continue with state updates
+      // Offline fallback
     }
 
     setBookings((prev) =>
@@ -300,7 +303,7 @@ export default function AdminPage() {
         reason
       );
     } catch {
-      // In offline sandbox
+      // Offline fallback
     }
 
     setBookings((prev) =>
@@ -324,7 +327,7 @@ export default function AdminPage() {
     setAuditLogs((prev) => [newLog, ...prev]);
 
     setBannerNotice(
-      `Requisition #${bookingId.substring(0, 8)} REJECTED. Mandatory justification committed to public audit trail.`
+      `Requisition #${bookingId.substring(0, 8)} REJECTED. Mandatory statutory ground committed to public audit trail.`
     );
     setIsSubmitting(false);
   };
@@ -333,91 +336,90 @@ export default function AdminPage() {
     <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] font-body selection:bg-[#DD700B] selection:text-white flex flex-col justify-between">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Admin Header Banner */}
-        <section className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] p-6 sm:p-8 space-y-4 text-[#1C1D1A]">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-300 border border-blue-500/30">
-                <ShieldCheck className="h-4 w-4" />
-                <span>Dean Administrative Console • Anti-Corruption Oversight</span>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8 flex-1">
+        {/* ── ADMIN HEADER BANNER ────────────────────────────────────────── */}
+        <section className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] p-6 sm:p-8 space-y-6 text-[#1C1D1A]">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#1C1D1A] px-3 py-1 text-xs font-display font-extrabold text-[#FCF8D8]">
+                <ShieldCheck className="h-4 w-4 text-[#DD700B]" />
+                <span>Dean Administrative Console • Statutory Oversight</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                Government College Asset Sanctioning Dashboard
+              <h1 className="text-2xl sm:text-3xl font-display font-extrabold tracking-tight text-[#1C1D1A]">
+                College Infrastructure Sanctioning Registry
               </h1>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-                Adjudicate facility reservation requests from NGOs and Corporates. All decisions are immutably logged. Arbitrary rejections are blocked by law.
+              <p className="text-xs sm:text-sm text-[#7C7D75] font-semibold leading-relaxed">
+                Adjudicate facility reservation requests from verified NGOs and Corporates. Decisions are immutably written to the state audit ledger. Arbitrary denials are strictly blocked under Section 21.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 bg-[#FCF8D8] p-3.5 rounded-xl border border-[#1C1D1A]">
-              <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-sm">
+            <div className="flex items-center gap-3 bg-[#FCF8D8] p-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] shrink-0">
+              <div className="h-11 w-11 rounded-xl bg-[#DD700B] text-white flex items-center justify-center font-display font-extrabold text-sm border border-[#1C1D1A]">
                 AD
               </div>
               <div>
-                <p className="text-xs font-bold text-white">{user.name}</p>
-                <p className="text-[11px] text-slate-400">{user.organization}</p>
-                <span className="text-[10px] text-emerald-400 font-semibold">● Authority Level: Verified Admin</span>
+                <p className="text-xs font-display font-extrabold text-[#1C1D1A]">{user.name}</p>
+                <p className="text-[11px] text-[#7C7D75] font-semibold">{user.organization}</p>
+                <span className="text-[10px] text-[#DD700B] font-extrabold">● Statutory Authority: Dean SSO</span>
               </div>
             </div>
           </div>
 
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-[#1C1D1A] mt-6">
-            <div className="rounded-xl bg-[#FCF8D8] p-3.5 border border-[#1C1D1A]">
-              <p className="text-[10px] uppercase font-semibold text-amber-400">Pending Review</p>
-              <p className="text-2xl font-bold text-white">{pendingList.length} Requests</p>
+          {/* Quick Metrics Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t-2 border-[#1C1D1A]/15">
+            <div className="rounded-2xl bg-[#FCF8D8] p-4 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+              <p className="text-[10px] uppercase font-display font-extrabold text-[#DD700B]">Pending Review</p>
+              <p className="text-2xl font-display font-extrabold text-[#1C1D1A] mt-0.5">{pendingList.length} Requests</p>
             </div>
-            <div className="rounded-xl bg-[#FCF8D8] p-3.5 border border-[#1C1D1A]">
-              <p className="text-[10px] uppercase font-semibold text-emerald-400">Sanctioned</p>
-              <p className="text-2xl font-bold text-white">
+            <div className="rounded-2xl bg-[#D9DADF] p-4 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+              <p className="text-[10px] uppercase font-display font-extrabold text-[#1C1D1A]">Sanctioned</p>
+              <p className="text-2xl font-display font-extrabold text-[#1C1D1A] mt-0.5">
                 {bookings.filter((b) => b.status === 'approved').length} Bookings
               </p>
             </div>
-            <div className="rounded-xl bg-[#FCF8D8] p-3.5 border border-[#1C1D1A]">
-              <p className="text-[10px] uppercase font-semibold text-red-400">Justified Rejections</p>
-              <p className="text-2xl font-bold text-white">
+            <div className="rounded-2xl bg-white p-4 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+              <p className="text-[10px] uppercase font-display font-extrabold text-[#7C7D75]">Justified Rejections</p>
+              <p className="text-2xl font-display font-extrabold text-[#1C1D1A] mt-0.5">
                 {bookings.filter((b) => b.status === 'rejected').length} Decisions
               </p>
             </div>
-            <div className="rounded-xl bg-[#FCF8D8] p-3.5 border border-[#1C1D1A]">
-              <p className="text-[10px] uppercase font-semibold text-blue-400">Audit Compliance</p>
-              <p className="text-2xl font-bold text-emerald-400">100% Sealed</p>
+            <div className="rounded-2xl bg-[#FCF8D8] p-4 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+              <p className="text-[10px] uppercase font-display font-extrabold text-[#DD700B]">Audit Compliance</p>
+              <p className="text-2xl font-display font-extrabold text-[#DD700B] mt-0.5">100% Sealed</p>
             </div>
           </div>
         </section>
 
         {/* Action Confirmation Banner */}
         {bannerNotice && (
-          <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-950 flex items-center justify-between shadow-xs">
+          <div className="rounded-2xl border-2 border-[#1C1D1A] bg-[#FCF8D8] p-4 text-[#1C1D1A] flex items-center justify-between shadow-[3px_3px_0px_0px_#1C1D1A]">
             <div className="flex items-center gap-3">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="h-5 w-5 text-[#DD700B] shrink-0" />
               <p className="text-xs sm:text-sm font-semibold">{bannerNotice}</p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
+            <button
+              type="button"
               onClick={() => setBannerNotice(null)}
-              className="text-xs bg-white text-emerald-900 border-emerald-300 hover:bg-emerald-100"
+              className="text-xs font-display font-extrabold px-3 py-1 bg-white hover:bg-[#D9DADF] rounded-xl border-2 border-[#1C1D1A] cursor-pointer"
             >
               Dismiss
-            </Button>
+            </button>
           </div>
         )}
 
-        {/* Navigation Tabs */}
-        <div className="flex border-b border-slate-200 gap-4 text-sm font-semibold overflow-x-auto">
+        {/* ── NAVIGATION TABS ────────────────────────────────────────────── */}
+        <div className="flex border-b-2 border-[#1C1D1A] gap-2 overflow-x-auto pb-1 text-xs font-display font-extrabold">
           <button
             type="button"
             onClick={() => setActiveTab('pending')}
-            className={`pb-3 px-1 border-b-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+            className={`py-2 px-3.5 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'pending'
-                ? 'border-[#DD700B] text-[#1C1D1A] font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'bg-[#1C1D1A] text-[#FCF8D8] border-[#1C1D1A] shadow-[2px_2px_0px_0px_#DD700B]'
+                : 'bg-white text-[#1C1D1A] border-[#1C1D1A] hover:bg-[#D9DADF]'
             }`}
           >
             <span>Pending Requisitions</span>
-            <span className="rounded-full bg-amber-100 text-amber-900 text-[11px] font-bold px-2 py-0.5">
+            <span className="rounded-md bg-[#DD700B] text-white text-[10px] font-extrabold px-2 py-0.2">
               {pendingList.length}
             </span>
           </button>
@@ -425,207 +427,221 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => setActiveTab('all')}
-            className={`pb-3 px-1 border-b-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+            className={`py-2 px-3.5 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'all'
-                ? 'border-[#DD700B] text-[#1C1D1A] font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'bg-[#1C1D1A] text-[#FCF8D8] border-[#1C1D1A] shadow-[2px_2px_0px_0px_#DD700B]'
+                : 'bg-white text-[#1C1D1A] border-[#1C1D1A] hover:bg-[#D9DADF]'
             }`}
           >
-            <span>All Historical Bookings ({bookings.length})</span>
+            <span>All Bookings ({bookings.length})</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('audit')}
-            className={`pb-3 px-1 border-b-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+            className={`py-2 px-3.5 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'audit'
-                ? 'border-[#DD700B] text-[#1C1D1A] font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'bg-[#1C1D1A] text-[#FCF8D8] border-[#1C1D1A] shadow-[2px_2px_0px_0px_#DD700B]'
+                : 'bg-white text-[#1C1D1A] border-[#1C1D1A] hover:bg-[#D9DADF]'
             }`}
           >
-            <Lock className="h-4 w-4 text-blue-700" />
+            <Lock className="h-3.5 w-3.5 text-[#DD700B]" />
             <span>Immutable Asset Ledger ({auditLogs.length})</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('security')}
-            className={`pb-3 px-1 border-b-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+            className={`py-2 px-3.5 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'security'
-                ? 'border-[#DD700B] text-[#1C1D1A] font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'bg-[#1C1D1A] text-[#FCF8D8] border-[#1C1D1A] shadow-[2px_2px_0px_0px_#DD700B]'
+                : 'bg-white text-[#1C1D1A] border-[#1C1D1A] hover:bg-[#D9DADF]'
             }`}
           >
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            <span>Central Security & Access Audit ({securityEvents.length})</span>
+            <ShieldCheck className="h-3.5 w-3.5 text-[#DD700B]" />
+            <span>Central Security Audit ({securityEvents.length})</span>
           </button>
         </div>
 
-        {/* TAB 1: Pending Requisitions */}
+        {/* ── TAB 1: PENDING REQUISITIONS ─────────────────────────────────── */}
         {activeTab === 'pending' && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-bold text-slate-900">
+                <h2 className="text-base font-display font-extrabold text-[#1C1D1A]">
                   Awaiting Administrative Adjudication ({pendingList.length})
                 </h2>
-                <p className="text-xs text-slate-500">
-                  Decision SLA: Within 48 hours. Any rejection strictly requires statutory justification.
+                <p className="text-xs text-[#7C7D75] font-semibold">
+                  Decision SLA: Within 48 hours. Any rejection strictly requires mandatory statutory justification.
                 </p>
               </div>
             </div>
 
             {pendingList.length === 0 ? (
-              <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center space-y-3">
-                <CheckCircle2 className="h-12 w-12 text-emerald-600 mx-auto" />
-                <h3 className="text-base font-bold text-slate-900">All Requisitions Adjudicated</h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  There are currently no pending facility requests. All applications have been processed.
+              <div className="rounded-3xl border-2 border-[#1C1D1A] bg-white p-12 text-center space-y-3 shadow-[4px_4px_0px_0px_#1C1D1A]">
+                <CheckCircle2 className="h-12 w-12 text-[#DD700B] mx-auto" />
+                <h3 className="text-base font-display font-extrabold text-[#1C1D1A]">All Requisitions Adjudicated</h3>
+                <p className="text-xs text-[#7C7D75] max-w-sm mx-auto font-semibold">
+                  There are currently no pending facility requests. All applications have been processed in compliance with state statutory SLA.
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {pendingList.map((booking) => (
-                  <Card key={booking.id} className="border-slate-200 shadow-xs hover:border-slate-300 transition-all bg-white">
-                    <CardContent className="p-5 sm:p-6 space-y-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-slate-500">
-                            #{booking.id.substring(0, 8)}
+                  <div
+                    key={booking.id}
+                    className="rounded-3xl border-2 border-[#1C1D1A] bg-white shadow-[4px_4px_0px_0px_#1C1D1A] p-5 sm:p-6 space-y-4 transition-all"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-[#1C1D1A]/10 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-extrabold text-[#1C1D1A] px-2 py-0.5 rounded-md bg-[#FCF8D8] border border-[#1C1D1A]">
+                          #{booking.id.substring(0, 8)}
+                        </span>
+                        <span className="text-[#ADACA7]">•</span>
+                        <span className="text-xs text-[#7C7D75] font-semibold">
+                          Applied: {format(new Date(booking.createdAt), 'dd MMM yyyy, HH:mm')}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] uppercase font-display font-extrabold px-2.5 py-0.5 rounded-full border border-[#1C1D1A] ${
+                          booking.applicantRole === 'ngo' ? 'bg-[#DD700B] text-white' : 'bg-[#D9DADF] text-[#1C1D1A]'
+                        }`}>
+                          {booking.applicantRole === 'ngo' ? 'Tier 1 • 70% NGO Quota' : 'Tier 2 • Corporate'}
+                        </span>
+                        <span className="text-[10px] uppercase font-display font-extrabold px-2.5 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] border border-[#1C1D1A]">
+                          Pending Dean Review
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                      <div>
+                        <p className="text-[11px] text-[#7C7D75] font-display font-extrabold uppercase tracking-wider">
+                          Applicant Entity
+                        </p>
+                        <p className="text-sm font-display font-extrabold text-[#1C1D1A] mt-0.5">{booking.applicantName}</p>
+                        <p className="text-[11px] text-[#7C7D75] font-semibold mt-0.5">Verified Society / Registration 80G</p>
+                      </div>
+
+                      <div>
+                        <p className="text-[11px] text-[#7C7D75] font-display font-extrabold uppercase tracking-wider">
+                          Requested Facility & Schedule
+                        </p>
+                        <p className="text-sm font-display font-extrabold text-[#1C1D1A] mt-0.5">{booking.spaceName}</p>
+                        <p className="text-[11px] text-[#1C1D1A] font-bold flex items-center gap-1 mt-0.5">
+                          <Clock className="h-3.5 w-3.5 text-[#DD700B]" />
+                          <span>
+                            {format(new Date(booking.startDate), 'dd MMM yyyy')} to{' '}
+                            {format(new Date(booking.endDate), 'dd MMM yyyy')}
                           </span>
-                          <span className="text-slate-300">•</span>
-                          <span className="text-xs text-slate-500">
-                            Applied: {format(new Date(booking.createdAt), 'dd MMM yyyy, HH:mm')}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            variant={booking.applicantRole === 'ngo' ? 'success' : 'gov'}
-                            className="text-[10px] uppercase font-bold"
-                          >
-                            {booking.applicantRole === 'ngo' ? 'Tier 1 • NGO Quota' : 'Tier 2 • Corporate'}
-                          </Badge>
-                          <Badge variant="warning" className="text-[10px] uppercase font-bold">
-                            PENDING DEAN REVIEW
-                          </Badge>
-                        </div>
+                        </p>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                        <div>
-                          <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
-                            Applicant Entity
-                          </p>
-                          <p className="text-sm font-bold text-slate-900 mt-0.5">{booking.applicantName}</p>
-                          <p className="text-[11px] text-slate-500">Verified Society / Registration 80G</p>
-                        </div>
+                      <div>
+                        <p className="text-[11px] text-[#7C7D75] font-display font-extrabold uppercase tracking-wider">
+                          Mandatory Documentation
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setPreviewDoc({
+                              name: booking.docName,
+                              url: booking.docUrl,
+                              applicant: booking.applicantName,
+                            })
+                          }
+                          className="inline-flex items-center gap-1.5 text-xs text-[#1C1D1A] font-extrabold hover:text-[#DD700B] mt-1.5 p-2 rounded-xl bg-[#FCF8D8] border border-[#1C1D1A] cursor-pointer"
+                        >
+                          <FileText className="h-4 w-4 text-[#DD700B]" />
+                          <span>{booking.docName}</span>
+                          <Eye className="h-3 w-3 text-[#7C7D75] ml-1" />
+                        </button>
+                      </div>
+                    </div>
 
-                        <div>
-                          <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
-                            Requested Facility & Dates
-                          </p>
-                          <p className="text-sm font-bold text-slate-900 mt-0.5">{booking.spaceName}</p>
-                          <p className="text-[11px] text-slate-600 flex items-center gap-1 mt-0.5">
-                            <Clock className="h-3.5 w-3.5 text-blue-700" />
-                            <span>
-                              {format(new Date(booking.startDate), 'dd MMM yyyy')} to{' '}
-                              {format(new Date(booking.endDate), 'dd MMM yyyy')}
-                            </span>
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
-                            Mandatory Documentation
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setPreviewDoc({
-                                name: booking.docName,
-                                url: booking.docUrl,
-                                applicant: booking.applicantName,
-                              })
-                            }
-                            className="inline-flex items-center gap-1.5 text-xs text-[#1C1D1A] font-semibold hover:underline mt-1 cursor-pointer"
-                          >
-                            <FileText className="h-4 w-4 text-blue-700" />
-                            <span>{booking.docName}</span>
-                            <Eye className="h-3 w-3 text-slate-400 ml-1" />
-                          </button>
-                        </div>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t-2 border-[#1C1D1A]/10">
+                      <div className="text-[11px] text-[#7C7D75] font-semibold flex items-center gap-1">
+                        <ShieldCheck className="h-4 w-4 text-[#DD700B]" />
+                        <span>All actions permanently recorded in the public ledger under Section 21.</span>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100">
-                        <div className="text-[11px] text-slate-500 flex items-center gap-1">
-                          <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-                          <span>All actions permanently recorded in the public ledger.</span>
-                        </div>
+                      <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                        <button
+                          type="button"
+                          disabled={isSubmitting}
+                          onClick={() => setRejectingBooking(booking)}
+                          className="flex-1 sm:flex-none text-xs font-display font-extrabold h-10 px-4 rounded-2xl bg-white hover:bg-[#D9DADF] text-[#1C1D1A] border-2 border-[#1C1D1A] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          <XCircle className="h-3.5 w-3.5 text-[#DD700B]" />
+                          <span>Reject with Reason</span>
+                        </button>
 
-                        <div className="flex items-center gap-2.5 w-full sm:w-auto">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            disabled={isSubmitting}
-                            onClick={() => setRejectingBooking(booking)}
-                            className="text-xs h-9 px-4 font-semibold"
-                          >
-                            <XCircle className="h-3.5 w-3.5 mr-1" />
-                            <span>Reject with Reason</span>
-                          </Button>
-
-                          <Button
-                            variant="gov"
-                            size="sm"
-                            disabled={isSubmitting}
-                            onClick={() => handleApprove(booking)}
-                            className="text-xs h-9 px-5 font-semibold bg-emerald-700 hover:bg-emerald-800 text-white"
-                          >
-                            <Check className="h-3.5 w-3.5 mr-1" />
-                            <span>Sanction Allocation</span>
-                          </Button>
-                        </div>
+                        <button
+                          type="button"
+                          disabled={isSubmitting}
+                          onClick={() => handleApprove(booking)}
+                          className="flex-1 sm:flex-none text-xs font-display font-extrabold h-10 px-5 rounded-2xl bg-[#DD700B] hover:bg-[#c96205] text-white border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] transition-all hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          <Check className="h-3.5 w-3.5" />
+                          <span>Sanction Allocation</span>
+                        </button>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
           </section>
         )}
 
-        {/* TAB 2: All Bookings Table */}
+        {/* ── TAB 2: ALL HISTORICAL BOOKINGS TABLE ────────────────────────── */}
         {activeTab === 'all' && (
           <section className="space-y-4">
-            <div className="rounded-xl border border-slate-200 bg-white shadow-xs overflow-x-auto">
+            <div className="rounded-3xl border-2 border-[#1C1D1A] bg-white shadow-[4px_4px_0px_0px_#1C1D1A] overflow-hidden overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                <thead className="bg-[#FCF8D8] text-[11px] font-display font-extrabold uppercase tracking-wider text-[#1C1D1A] border-b-2 border-[#1C1D1A]">
                   <tr>
-                    <th className="p-3.5 font-bold">App Token</th>
-                    <th className="p-3.5 font-bold">Applicant</th>
-                    <th className="p-3.5 font-bold">Facility</th>
-                    <th className="p-3.5 font-bold">Dates</th>
-                    <th className="p-3.5 font-bold">Status</th>
-                    <th className="p-3.5 font-bold">Statutory Reason / Notes</th>
+                    <th className="p-3.5">App Token</th>
+                    <th className="p-3.5">Applicant Entity</th>
+                    <th className="p-3.5">Facility</th>
+                    <th className="p-3.5">Schedule</th>
+                    <th className="p-3.5">Status</th>
+                    <th className="p-3.5">Statutory Reason / Notes</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#1C1D1A]/10">
                   {bookings.map((b) => (
-                    <tr key={b.id} className="hover:bg-slate-50/70">
-                      <td className="p-3.5 font-mono font-bold text-slate-700">#{b.id.substring(0, 8)}</td>
-                      <td className="p-3.5 font-semibold text-slate-900">{b.applicantName}</td>
-                      <td className="p-3.5">{b.spaceName}</td>
-                      <td className="p-3.5">
+                    <tr key={b.id} className="hover:bg-[#FCF8D8]/40 transition-colors">
+                      <td className="p-3.5 font-mono font-extrabold text-[#1C1D1A]">#{b.id.substring(0, 8)}</td>
+                      <td className="p-3.5 font-bold text-[#1C1D1A]">{b.applicantName}</td>
+                      <td className="p-3.5 text-[#1C1D1A] font-medium">{b.spaceName}</td>
+                      <td className="p-3.5 text-[#7C7D75] font-semibold whitespace-nowrap">
                         {b.startDate} to {b.endDate}
                       </td>
                       <td className="p-3.5">
-                        {b.status === 'approved' && <Badge variant="success">APPROVED</Badge>}
-                        {b.status === 'pending' && <Badge variant="warning">PENDING</Badge>}
-                        {b.status === 'rejected' && <Badge variant="destructive">REJECTED</Badge>}
-                        {b.status === 'completed' && <Badge variant="secondary">COMPLETED</Badge>}
+                        {b.status === 'approved' && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-display font-extrabold bg-[#DD700B] text-white border border-[#1C1D1A]">
+                            APPROVED
+                          </span>
+                        )}
+                        {b.status === 'pending' && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-display font-extrabold bg-[#1C1D1A] text-[#FCF8D8] border border-[#1C1D1A]">
+                            PENDING
+                          </span>
+                        )}
+                        {b.status === 'rejected' && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-display font-extrabold bg-[#7C7D75] text-white border border-[#1C1D1A]">
+                            REJECTED
+                          </span>
+                        )}
+                        {b.status === 'completed' && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-display font-extrabold bg-[#D9DADF] text-[#1C1D1A] border border-[#1C1D1A]">
+                            COMPLETED
+                          </span>
+                        )}
                       </td>
-                      <td className="p-3.5 text-slate-600 max-w-xs truncate italic">
-                        {b.rejectionReason || b.approvalReason || '—'}
+                      <td className="p-3.5 text-[#1C1D1A]/80 max-w-xs truncate italic font-medium">
+                        {b.rejectionReason || b.approvalReason || 'Awaiting adjudication'}
                       </td>
                     </tr>
                   ))}
@@ -635,96 +651,90 @@ export default function AdminPage() {
           </section>
         )}
 
-        {/* TAB 3: Immutable Asset Ledger */}
+        {/* ── TAB 3: IMMUTABLE ASSET LEDGER ───────────────────────────────── */}
         {activeTab === 'audit' && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Lock className="h-4 w-4 text-[#1C1D1A]" />
-                  Statutory Public Asset Audit Ledger
+                <h2 className="text-base font-display font-extrabold text-[#1C1D1A] flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-[#DD700B]" />
+                  <span>Statutory Public Asset Audit Ledger</span>
                 </h2>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[#7C7D75] font-semibold">
                   Tamper-evident record of all allocation requests, administrative sanctions, and mandatory justifications.
                 </p>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+            <div className="rounded-3xl border-2 border-[#1C1D1A] bg-white p-6 shadow-[4px_4px_0px_0px_#1C1D1A]">
               <AuditTimeline logs={auditLogs} />
             </div>
           </section>
         )}
 
-        {/* TAB 4: Central Security & Access Audit Ledger */}
+        {/* ── TAB 4: CENTRAL SECURITY AUDIT ───────────────────────────────── */}
         {activeTab === 'security' && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-emerald-700" />
-                  Central Security & Access Audit Trail
+                <h2 className="text-base font-display font-extrabold text-[#1C1D1A] flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-[#DD700B]" />
+                  <span>Central Security & Access Audit Trail</span>
                 </h2>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[#7C7D75] font-semibold">
                   Real-time security telemetry: Authentication events, brute-force rate limit enforcement, and Proxy route interceptions.
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
+              <button
+                type="button"
                 onClick={async () => {
                   const res = await getSecurityAuditLogsAction();
                   if (res.success && res.data) setSecurityEvents(res.data);
                 }}
-                className="text-xs gap-1.5"
+                className="text-xs font-display font-extrabold px-3 py-1.5 rounded-xl bg-white hover:bg-[#D9DADF] border-2 border-[#1C1D1A] flex items-center gap-1.5 cursor-pointer"
               >
-                <Activity className="h-3.5 w-3.5 text-blue-700" />
+                <Activity className="h-3.5 w-3.5 text-[#DD700B]" />
                 <span>Refresh Telemetry</span>
-              </Button>
+              </button>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-              <div className="p-4 bg-white text-white flex flex-wrap items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="font-bold">Next.js 16 Security Proxy Guard Active</span>
+            <div className="rounded-3xl border-2 border-[#1C1D1A] bg-white shadow-[4px_4px_0px_0px_#1C1D1A] overflow-hidden">
+              <div className="p-4 bg-[#1C1D1A] text-[#FCF8D8] flex flex-wrap items-center justify-between gap-3 text-xs border-b-2 border-[#1C1D1A]">
+                <div className="flex items-center gap-2 font-display font-extrabold">
+                  <span className="h-2 w-2 rounded-full bg-[#DD700B] animate-pulse" />
+                  <span>Next.js 16 Security Proxy Guard Active</span>
                 </div>
-                <div className="flex items-center gap-4 text-slate-300 text-[11px]">
+                <div className="flex items-center gap-4 text-[#ADACA7] text-[11px] font-mono">
                   <span>Rate Limiting: 5 attempts/15m</span>
-                  <span>Encryption: 256-Bit SHA & TLS</span>
+                  <span>•</span>
+                  <span>Encryption: 256-Bit SHA</span>
+                  <span>•</span>
                   <span>Session: HttpOnly Strict</span>
                 </div>
               </div>
 
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-[#1C1D1A]/10">
                 {securityEvents.map((event) => (
-                  <div key={event.id} className="p-4 hover:bg-slate-50/80 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div key={event.id} className="p-4 hover:bg-[#FCF8D8]/30 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Badge
-                          variant={
-                            event.status === 'SUCCESS'
-                              ? 'success'
-                              : event.status === 'BLOCKED'
-                              ? 'destructive'
-                              : 'warning'
-                          }
-                          className="text-[9px] font-mono uppercase"
-                        >
+                        <span className={`text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded border border-[#1C1D1A] ${
+                          event.status === 'SUCCESS' ? 'bg-[#FCF8D8] text-[#1C1D1A]' : 'bg-[#DD700B] text-white'
+                        }`}>
                           {event.eventType}
-                        </Badge>
-                        <span className="font-semibold text-slate-800">{event.email}</span>
+                        </span>
+                        <span className="font-extrabold text-[#1C1D1A]">{event.email}</span>
                         {event.role && (
-                          <span className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded uppercase font-semibold">
+                          <span className="text-[10px] text-[#7C7D75] bg-[#D9DADF] px-1.5 py-0.5 rounded uppercase font-bold">
                             {event.role}
                           </span>
                         )}
                       </div>
-                      <p className="text-slate-600 text-[11px] leading-relaxed">{event.details}</p>
+                      <p className="text-[#7C7D75] text-[11px] font-medium leading-relaxed">{event.details}</p>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <span className="text-[10px] font-mono text-slate-400">
+                      <span className="text-[10px] font-mono text-[#7C7D75]">
                         {format(new Date(event.timestamp), 'dd MMM yyyy, HH:mm:ss')}
                       </span>
                     </div>
@@ -749,43 +759,47 @@ export default function AdminPage() {
 
       {/* Document Preview Dialog */}
       <Dialog open={!!previewDoc} onOpenChange={(open) => !open && setPreviewDoc(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-white border-2 border-[#1C1D1A] rounded-3xl p-6 shadow-[5px_5px_0px_0px_#1C1D1A]">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-800" />
+            <DialogTitle className="text-base font-display font-extrabold flex items-center gap-2 text-[#1C1D1A]">
+              <FileText className="h-5 w-5 text-[#DD700B]" />
               <span>Statutory Eligibility Document</span>
             </DialogTitle>
-            <DialogDescription className="text-xs">
+            <DialogDescription className="text-xs text-[#7C7D75] font-semibold">
               Submitted by <strong>{previewDoc?.applicant}</strong>
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+          <div className="p-4 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] space-y-3 mt-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-slate-700">File Name:</span>
-              <span className="font-mono text-slate-900">{previewDoc?.name}</span>
+              <span className="font-extrabold text-[#1C1D1A]">File Name:</span>
+              <span className="font-mono text-[#1C1D1A] font-semibold">{previewDoc?.name}</span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-slate-700">Verification Status:</span>
-              <Badge variant="success" className="text-[10px]">
+              <span className="font-extrabold text-[#1C1D1A]">Verification Status:</span>
+              <span className="text-[10px] font-display font-extrabold px-2 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8]">
                 Verified Digital Hash
-              </Badge>
+              </span>
             </div>
-            <div className="p-6 bg-white rounded-lg border border-dashed border-slate-300 text-center space-y-2">
-              <FileText className="h-10 w-10 text-blue-700 mx-auto" />
-              <p className="text-xs font-semibold text-slate-800">
+            <div className="p-6 bg-white rounded-xl border-2 border-dashed border-[#1C1D1A] text-center space-y-2">
+              <FileText className="h-10 w-10 text-[#DD700B] mx-auto" />
+              <p className="text-xs font-display font-extrabold text-[#1C1D1A]">
                 Official Society Registration & 12A/80G Certificate
               </p>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-[#7C7D75] font-semibold">
                 Issued by State Registrar of Public Charitable Trusts
               </p>
             </div>
           </div>
 
-          <div className="flex justify-end pt-2">
-            <Button variant="outline" size="sm" onClick={() => setPreviewDoc(null)}>
+          <div className="flex justify-end pt-3">
+            <button
+              type="button"
+              onClick={() => setPreviewDoc(null)}
+              className="px-4 py-2 bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-xs rounded-xl border-2 border-[#1C1D1A] cursor-pointer"
+            >
               Close Preview
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>
