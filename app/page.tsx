@@ -164,10 +164,10 @@ export default function CleanFrozenMistHome() {
               </div>
             </Link>
 
-            <Link href="/login">
+            <Link href="/user/login">
               <div className="bg-[#D9DADF] hover:bg-[#c7c9cf] text-[#1C1D1A] px-3.5 py-2 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] text-xs font-display font-bold flex items-center gap-1.5 transition-all hover:-translate-y-0.5">
                 <span className="px-1.5 py-0.2 rounded bg-black/20 text-[10px]">04</span>
-                <span>SSO Gateway</span>
+                <span>User Portal</span>
               </div>
             </Link>
           </nav>
@@ -186,22 +186,33 @@ export default function CleanFrozenMistHome() {
                 <button
                   type="button"
                   onClick={() => logout()}
-                  className="p-1 rounded-lg hover:bg-black/10 text-[#1C1D1A] transition-colors"
+                  className="p-1 rounded-lg hover:bg-black/10 text-[#1C1D1A] transition-colors cursor-pointer"
                   title="Sign Out"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                 </button>
               </div>
             ) : (
-              <Link href="/login">
-                <button
-                  type="button"
-                  className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-2 px-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#DD700B] flex items-center gap-1.5 cursor-pointer"
-                >
-                  <LogIn className="h-3.5 w-3.5 text-[#DD700B]" />
-                  <span>SIGN IN</span>
-                </button>
-              </Link>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Link href="/user/login">
+                  <button
+                    type="button"
+                    className="bg-[#DD700B] hover:bg-[#c25e04] text-white font-display font-extrabold text-xs py-2 px-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center gap-1.5 cursor-pointer transition-all hover:-translate-y-0.5"
+                  >
+                    <LogIn className="h-3.5 w-3.5 text-white" />
+                    <span>USER LOGIN</span>
+                  </button>
+                </Link>
+                <Link href="/login" className="hidden sm:block">
+                  <button
+                    type="button"
+                    className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-2 px-3 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#7C7D75] flex items-center gap-1.5 cursor-pointer transition-all hover:-translate-y-0.5"
+                  >
+                    <Lock className="h-3 w-3 text-[#DD700B]" />
+                    <span>DEAN SSO</span>
+                  </button>
+                </Link>
+              </div>
             )}
           </div>
         </div>
@@ -583,7 +594,8 @@ export default function CleanFrozenMistHome() {
             <Link href="/discover" className="hover:text-[#1C1D1A]">01. Discover</Link>
             <Link href="/admin" className="hover:text-[#1C1D1A]">02. Dean Review</Link>
             <Link href="/bookings" className="hover:text-[#1C1D1A]">03. Inspection Proof</Link>
-            <Link href="/login" className="hover:text-[#1C1D1A]">04. SSO Login</Link>
+            <Link href="/user/login" className="hover:text-[#1C1D1A]">04. User Login</Link>
+            <Link href="/login" className="hover:text-[#1C1D1A]">05. Dean SSO</Link>
           </div>
         </div>
       </footer>

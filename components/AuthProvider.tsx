@@ -8,12 +8,15 @@ import {
   getCurrentUserAction,
   loginAction,
   logoutAction,
+  registerUserAction,
+  type RegisterUserInput,
 } from '@/app/auth-actions';
 
 interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; remainingSeconds?: number }>;
+  register: (input: RegisterUserInput) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   switchDemoRole: (role: 'admin' | 'ngo' | 'corporate') => Promise<void>;
 }
@@ -77,6 +80,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [router]
   );
 
+  // Register handler
+  const register = React.useCallback(
+    async (input: RegisterUserInput) => {
+      try {
+        const res = await registerUserAction(input);
+        if (res.success) {
+          setUser(res.user);
+          router.refresh();
+          return { success: true };
+        } else {
+          return {
+            success: false,
+            error: res.error,
+          };
+        }
+      } catch (err) {
+        return {
+          success: false,
+          error: err instanceof Error ? err.message : 'Registration failed due to an unexpected error.',
+        };
+      }
+    },
+    [router]
+  );
+
   // Logout handler
   const logout = React.useCallback(async () => {
     try {
@@ -111,6 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         isLoading,
         login,
+        register,
         logout,
         switchDemoRole,
       }}

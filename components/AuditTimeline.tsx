@@ -23,6 +23,8 @@ export interface AuditTimelineItem {
   performerRole?: string;
   timestamp: string;
   details?: string;
+  bookingId?: string;
+  status?: string;
 }
 
 interface AuditTimelineProps {

@@ -220,15 +220,26 @@ export function Navbar() {
                 </Button>
               </div>
             ) : (
-              <Link href="/login">
-                <button
-                  type="button"
-                  className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-2 px-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#DD700B] flex items-center gap-1.5 cursor-pointer"
-                >
-                  <LogIn className="h-3.5 w-3.5 text-[#DD700B]" />
-                  <span>Sign In</span>
-                </button>
-              </Link>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Link href="/user/login">
+                  <button
+                    type="button"
+                    className="bg-[#DD700B] hover:bg-[#c25e04] text-white font-display font-extrabold text-xs py-1.5 px-3 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center gap-1.5 cursor-pointer transition-all hover:-translate-y-0.5"
+                  >
+                    <LogIn className="h-3.5 w-3.5 text-white" />
+                    <span>User Login</span>
+                  </button>
+                </Link>
+                <Link href="/login" className="hidden sm:block">
+                  <button
+                    type="button"
+                    className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-1.5 px-3 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#7C7D75] flex items-center gap-1.5 cursor-pointer transition-all hover:-translate-y-0.5"
+                  >
+                    <Lock className="h-3 w-3 text-[#FCF8D8]" />
+                    <span>Dean SSO</span>
+                  </button>
+                </Link>
+              </div>
             )}
           </div>
         </div>

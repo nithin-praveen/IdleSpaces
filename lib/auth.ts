@@ -64,6 +64,22 @@ export const DEMO_ACCOUNTS: (AuthUser & { passwordHash: string; plainDemoPasswor
   },
 ];
 
+// Dynamic In-Memory Store for Registered Users (Community, NGO, Corporate)
+export interface RegisteredUserRecord extends AuthUser {
+  passwordHash: string;
+  plainPassword?: string;
+}
+
+const registeredUsers = new Map<string, RegisteredUserRecord>();
+
+export function getRegisteredUserByEmail(email: string): RegisteredUserRecord | undefined {
+  return registeredUsers.get(email.toLowerCase().trim());
+}
+
+export function saveRegisteredUser(record: RegisteredUserRecord): void {
+  registeredUsers.set(record.email.toLowerCase().trim(), record);
+}
+
 // In-Memory Rate Limiting & Account Lockout Store
 interface AttemptRecord {
   count: number;

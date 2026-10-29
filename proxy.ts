@@ -46,8 +46,8 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // 3. If authenticated user tries to access /login, redirect to intended target or /discover
-  if (pathname === '/login' && user) {
+  // 3. If authenticated user tries to access /login or /user/login, redirect to intended target or /discover
+  if ((pathname === '/login' || pathname === '/user/login') && user) {
     const redirectParam = request.nextUrl.searchParams.get('redirect');
     const destination = redirectParam && redirectParam.startsWith('/') ? redirectParam : (user.role === 'admin' ? '/admin' : '/discover');
     return NextResponse.redirect(new URL(destination, request.url));

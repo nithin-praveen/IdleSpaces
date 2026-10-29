@@ -9,13 +9,25 @@ import {
   checkRateLimit,
   decodeSession,
   encodeSession,
+  getRegisteredUserByEmail,
   getSecurityAuditLogs,
+  hashPassword,
   recordSecurityEvent,
   registerFailedAttempt,
   resetFailedAttempts,
+  saveRegisteredUser,
 } from '@/lib/auth';
 import { createServerClient } from '@supabase/ssr';
 import type { Database } from '@/types/database';
+
+export interface RegisterUserInput {
+  name: string;
+  email: string;
+  organization: string;
+  role: 'ngo' | 'corporate';
+  password: string;
+  department?: string;
+}
 
 export type LoginResult =
   | { success: true; user: AuthUser; message?: string }
@@ -84,6 +96,26 @@ export async function loginAction(
       lastLogin: new Date().toISOString(),
     };
   } else {
+    // 3b. Check dynamically registered users
+    const registered = getRegisteredUserByEmail(email);
+    if (registered) {
+      const computedHash = await hashPassword(password);
+      if (registered.plainPassword === password || registered.passwordHash === computedHash) {
+        authenticatedUser = {
+          id: registered.id,
+          email: registered.email,
+          name: registered.name,
+          role: registered.role,
+          tier: registered.tier,
+          organization: registered.organization,
+          department: registered.department,
+          lastLogin: new Date().toISOString(),
+        };
+      }
+    }
+  }
+
+  if (!authenticatedUser) {
     // 4. Try Supabase Auth if configured
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -251,4 +283,137 @@ export async function getSecurityAuditLogsAction() {
     data: getSecurityAuditLogs(),
   };
 }
+
+/**
+ * Register a new applicant or community organization user
+ */
+export async function registerUserAction(input: RegisterUserInput): Promise<LoginResult> {
+  const name = input.name?.trim();
+  const email = input.email?.toLowerCase().trim();
+  const organization = input.organization?.trim();
+  const role = input.role;
+  const password = input.password?.trim();
+  const department = input.department?.trim();
+
+  // 1. Validation
+  if (!name || name.length < 2) {
+    return { success: false, error: 'Full name or representative name is required (min 2 characters).' };
+  }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { success: false, error: 'A valid email address is required.' };
+  }
+  if (!organization || organization.length < 2) {
+    return { success: false, error: 'Organization or community entity name is required.' };
+  }
+  if (!['ngo', 'corporate'].includes(role)) {
+    return { success: false, error: 'Please select a valid role (NGO or Corporate / Commercial).' };
+  }
+  if (!password || password.length < 8) {
+    return { success: false, error: 'Password must contain at least 8 characters.' };
+  }
+
+  // 2. Check duplicate email in DEMO_ACCOUNTS or registeredUsers
+  const existsInDemo = DEMO_ACCOUNTS.some((acc) => acc.email.toLowerCase() === email);
+  const existsInRegistered = getRegisteredUserByEmail(email);
+  if (existsInDemo || existsInRegistered) {
+    return {
+      success: false,
+      error: 'An account with this email address already exists. Please sign in or use a different email.',
+    };
+  }
+
+  // 3. Hash password
+  const passwordHash = await hashPassword(password);
+  const userId = `u-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const tier: 1 | 2 = role === 'ngo' ? 1 : 2;
+
+  const newUser: AuthUser = {
+    id: userId,
+    email,
+    name,
+    role,
+    tier,
+    organization,
+    department: department || (role === 'ngo' ? 'Community Outreach' : 'Corporate Relations'),
+    lastLogin: new Date().toISOString(),
+  };
+
+  // 4. Save to in-memory store
+  saveRegisteredUser({
+    ...newUser,
+    passwordHash,
+    plainPassword: password,
+  });
+
+  // 5. Optionally sync to Supabase if configured
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (
+    supabaseUrl &&
+    supabaseAnonKey &&
+    !supabaseUrl.includes('placeholder') &&
+    !supabaseUrl.includes('your-project')
+  ) {
+    try {
+      const cookieStore = await cookies();
+      const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+            } catch {}
+          },
+        },
+      });
+
+      const { data: authData } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: name, organization, role },
+        },
+      });
+
+      if (authData?.user) {
+        newUser.id = authData.user.id;
+        await supabase.from('users').upsert({
+          id: authData.user.id,
+          name,
+          role,
+          tier,
+        });
+      }
+    } catch (err) {
+      console.warn('[registerUserAction] Remote Supabase signup skipped (fallback in memory):', err);
+    }
+  }
+
+  // 6. Record security audit log
+  recordSecurityEvent({
+    eventType: 'LOGIN_SUCCESS',
+    email,
+    role,
+    status: 'SUCCESS',
+    details: `New ${role.toUpperCase()} account successfully registered: ${name} (${organization}). Session issued.`,
+  });
+
+  // 7. Issue HttpOnly session cookie
+  const cookieStore = await cookies();
+  const sessionToken = encodeSession(newUser);
+  cookieStore.set(SESSION_COOKIE_NAME, sessionToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: SESSION_MAX_AGE_SECONDS,
+  });
+
+  return {
+    success: true,
+    user: newUser,
+    message: `Account created successfully! Welcome to IdleSpaces, ${name}.`,
+  };
+}
+
 

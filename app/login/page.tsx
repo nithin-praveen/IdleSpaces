@@ -106,6 +106,20 @@ function LoginForm() {
 
   return (
     <Card className="border-slate-300 shadow-xl bg-white overflow-hidden rounded-2xl">
+      {/* Portal Switcher Banner */}
+      <div className="bg-slate-100 p-2 border-b border-slate-200 grid grid-cols-2 gap-1.5 text-xs font-semibold">
+        <Link
+          href="/user/login"
+          className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-white transition-all text-center"
+        >
+          <span>👥 User & NGO Portal</span>
+        </Link>
+        <div className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-blue-900 text-white shadow-xs text-center font-bold">
+          <ShieldCheck className="h-3.5 w-3.5 text-blue-300" />
+          <span>🏛️ Dean / Admin SSO</span>
+        </div>
+      </div>
+
       {/* Header with Security Ribbon */}
       <div className="bg-blue-900 px-6 py-5 text-white flex items-center justify-between">
         <div>
@@ -321,6 +335,20 @@ function LoginForm() {
               );
             })}
           </div>
+        </div>
+
+        {/* Link to User & Community Portal */}
+        <div className="pt-3 border-t border-slate-200 text-center">
+          <p className="text-xs text-slate-600">
+            Booking as an NGO, Community Group, or Corporate?{' '}
+            <Link
+              href="/user/login"
+              className="font-bold text-blue-900 hover:text-blue-700 underline underline-offset-2 ml-1 inline-flex items-center gap-1"
+            >
+              <span>Open User & NGO Login Portal</span>
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </p>
         </div>
       </CardContent>
 
