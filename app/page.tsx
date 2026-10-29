@@ -10,11 +10,9 @@ import {
   ArrowUpRight,
   ShieldCheck,
   Building,
-  Trophy,
   Lock,
   CalendarCheck2,
   Clock,
-  MapPin,
   ArrowRight,
   LogIn,
   LogOut,
@@ -23,10 +21,15 @@ import {
   Search,
   Sparkles,
   Users,
+  TrendingDown,
+  TrendingUp,
+  BarChart3,
+  Cpu,
+  FlaskConical,
+  Activity,
+  AlertTriangle,
+  FileCheck,
   CheckCircle2,
-  FileText,
-  Building2,
-  Award,
 } from 'lucide-react';
 
 const FEATURED_FACILITIES: Space[] = [
@@ -70,17 +73,9 @@ export default function CalmIdleSpacesHome() {
     setIsBookingOpen(true);
   };
 
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault();
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] font-body selection:bg-[#DD700B] selection:text-white flex flex-col justify-between">
-      {/* ── TOP NAVIGATION BAR (CALM & UNCLUTTERED) ───────────────────────── */}
+      {/* ── TOP NAVIGATION BAR (CLEAN & SEPARATE ROUTE LINKS) ─────────────── */}
       <header className="sticky top-0 z-40 bg-[#FCF8D8]/95 backdrop-blur-md border-b-2 border-[#1C1D1A] px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Logo & Brand Mark */}
@@ -91,7 +86,7 @@ export default function CalmIdleSpacesHome() {
             <span className="h-2.5 w-2.5 rounded-full bg-[#DD700B] animate-pulse" />
           </Link>
 
-          {/* Calm & Contextual Navigation Links */}
+          {/* Navigation to Separate Pages */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-display font-bold text-[#1C1D1A]">
             <Link
               href="/discover"
@@ -101,29 +96,19 @@ export default function CalmIdleSpacesHome() {
               <ArrowUpRight className="h-3 w-3 text-[#DD700B]" />
             </Link>
 
-            <a
-              href="#how-it-works"
-              onClick={(e) => scrollToSection(e, 'how-it-works')}
-              className="hover:text-[#DD700B] transition-colors py-1 cursor-pointer"
+            <Link
+              href="/how-it-works"
+              className="hover:text-[#DD700B] transition-colors py-1"
             >
               How It Works
-            </a>
+            </Link>
 
-            <a
-              href="#about"
-              onClick={(e) => scrollToSection(e, 'about')}
-              className="hover:text-[#DD700B] transition-colors py-1 cursor-pointer"
+            <Link
+              href="/about"
+              className="hover:text-[#DD700B] transition-colors py-1"
             >
               About
-            </a>
-
-            <a
-              href="#featured-facilities"
-              onClick={(e) => scrollToSection(e, 'featured-facilities')}
-              className="hover:text-[#DD700B] transition-colors py-1 cursor-pointer"
-            >
-              Facilities
-            </a>
+            </Link>
           </nav>
 
           {/* Top Right: User Login & Dean SSO */}
@@ -173,18 +158,16 @@ export default function CalmIdleSpacesHome() {
       </header>
 
       {/* ── CALM & RELAXED HERO SECTION ─────────────────────────────────── */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-20 flex-1">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-24 flex-1">
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          {/* Left Column: Clean Editorial Typography & CTAs (No rectangular tag) */}
+          {/* Left Column: Clean Editorial Typography & CTAs */}
           <div className="lg:col-span-7 space-y-6">
-            {/* Specified Headline */}
             <h1 className="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-[#1C1D1A] tracking-tight leading-[1.05]">
               Unlock <br className="hidden sm:inline" />
               underused spaces <br className="hidden sm:inline" />
               & equipment.
             </h1>
 
-            {/* Specified Body Copy */}
             <p className="text-base sm:text-lg text-[#1C1D1A]/85 font-medium leading-relaxed max-w-xl">
               A trusted, auditable sharing network connecting institutions, makerspaces, and research universities to share idle labs, CNCs, cleanrooms, and testing facilities without friction or risk.
             </p>
@@ -238,208 +221,289 @@ export default function CalmIdleSpacesHome() {
           </div>
         </section>
 
-        {/* ── SECTION 2: HOW THE NETWORK OPERATES (WORKFLOW STEPS + ACTIONS) ─ */}
-        <section id="how-it-works" className="scroll-mt-24 space-y-6">
-          <div className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] p-6 sm:p-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b-2 border-[#1C1D1A]">
-              <div>
-                <span className="font-display font-extrabold text-xs text-[#DD700B] uppercase tracking-wider block">
-                  Statutory Accountability
-                </span>
-                <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-[#1C1D1A] tracking-tight">
-                  How The Network Operates
-                </h2>
-              </div>
-              <span className="text-xs font-bold bg-[#D9DADF] text-[#1C1D1A] px-3 py-1 rounded-full border border-[#1C1D1A] self-start sm:self-auto">
-                Zero Bureaucratic Friction
-              </span>
-            </div>
-
-            {/* 3 Step Bento Cards with Action Entry Points */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Step 1 */}
-              <div className="p-5 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-display font-extrabold text-xs px-2 py-0.5 rounded-md bg-[#1C1D1A] text-[#FCF8D8]">
-                      STEP 01
-                    </span>
-                    <Search className="h-4 w-4 text-[#DD700B]" />
-                  </div>
-                  <h3 className="font-display font-extrabold text-base text-[#1C1D1A]">
-                    Discover & Request
-                  </h3>
-                  <p className="text-xs text-[#1C1D1A]/80 leading-relaxed font-medium">
-                    NGOs, community groups, and researchers browse idle slots and upload statutory registration (80G or Society NOC). Tier 1 community priority applies automatically.
-                  </p>
-                </div>
-
-                <Link href="/discover">
-                  <button
-                    type="button"
-                    className="w-full bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-2 px-3 rounded-xl border-2 border-[#1C1D1A] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    <span>Browse Catalog</span>
-                    <ArrowUpRight className="h-3.5 w-3.5 text-[#DD700B]" />
-                  </button>
-                </Link>
-              </div>
-
-              {/* Step 2 */}
-              <div className="p-5 rounded-2xl bg-[#D9DADF] border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-display font-extrabold text-xs px-2 py-0.5 rounded-md bg-[#1C1D1A] text-[#FCF8D8]">
-                      STEP 02
-                    </span>
-                    <ShieldCheck className="h-4 w-4 text-[#7C7D75]" />
-                  </div>
-                  <h3 className="font-display font-extrabold text-base text-[#1C1D1A]">
-                    Dean Administrative Review
-                  </h3>
-                  <p className="text-xs text-[#1C1D1A]/80 leading-relaxed font-medium">
-                    College authorities evaluate requests within an auditable 48-hour SLA. Rejections strictly require a mandatory gazette-backed statutory justification recorded in the immutable log.
-                  </p>
-                </div>
-
-                <Link href="/admin">
-                  <button
-                    type="button"
-                    className="w-full bg-white hover:bg-[#FCF8D8] text-[#1C1D1A] font-display font-extrabold text-xs py-2 px-3 rounded-xl border-2 border-[#1C1D1A] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    <Lock className="h-3 w-3 text-[#DD700B]" />
-                    <span>Dean Review Portal</span>
-                  </button>
-                </Link>
-              </div>
-
-              {/* Step 3 */}
-              <div className="p-5 rounded-2xl bg-white border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-display font-extrabold text-xs px-2 py-0.5 rounded-md bg-[#1C1D1A] text-[#FCF8D8]">
-                      STEP 03
-                    </span>
-                    <Camera className="h-4 w-4 text-[#DD700B]" />
-                  </div>
-                  <h3 className="font-display font-extrabold text-base text-[#1C1D1A]">
-                    Pre & Post Photo Proof
-                  </h3>
-                  <p className="text-xs text-[#1C1D1A]/80 leading-relaxed font-medium">
-                    Upload timestamped arrival photos and post-event clean handover photos. Automated inspection triggers immediate security deposit return without disputes.
-                  </p>
-                </div>
-
-                <Link href="/bookings">
-                  <button
-                    type="button"
-                    className="w-full bg-[#FCF8D8] hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-xs py-2 px-3 rounded-xl border-2 border-[#1C1D1A] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    <span>Check-In Proof Vault</span>
-                    <Camera className="h-3.5 w-3.5 text-[#DD700B]" />
-                  </button>
-                </Link>
-              </div>
-            </div>
-
-            {/* List Idle Facility Callout */}
-            <div className="pt-2 border-t-2 border-[#1C1D1A]/15 flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#FCF8D8] p-5 rounded-2xl border-2 border-[#1C1D1A]">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-[#DD700B] text-white flex items-center justify-center font-bold shrink-0 shadow-[2px_2px_0px_0px_#1C1D1A]">
-                  <Plus className="h-5 w-5" />
-                </div>
-                <div>
-                  <h4 className="font-display font-extrabold text-sm text-[#1C1D1A]">
-                    Represent a University, College, or Makerspace?
-                  </h4>
-                  <p className="text-xs text-[#7C7D75] font-semibold">
-                    List your underused laboratories, test benches, or auditoriums with statutory quota protection.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsListModalOpen(true)}
-                className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-2.5 px-4 rounded-xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#DD700B] flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
-              >
-                <Plus className="h-3.5 w-3.5 text-[#DD700B]" />
-                <span>List Idle Facility</span>
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* ── SECTION 3: ABOUT IDLESPACES & STATUTORY GUARANTEES ────────────── */}
-        <section id="about" className="scroll-mt-24 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        {/* ── SECTION 2: DATA ON UNUSED SPACES IN GENERAL (MACRO BENCHMARKS) ── */}
+        <section className="space-y-8 pt-6 border-t-2 border-[#1C1D1A]/15">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <span className="text-[11px] font-display font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] border border-[#1C1D1A]">
-                About The Network
-              </span>
-              <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-[#1C1D1A] tracking-tight mt-1.5">
-                Democratizing Public Infrastructure with Cryptographic Trust
+              <div className="inline-flex items-center gap-2 mb-1">
+                <span className="text-[11px] font-display font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] border border-[#1C1D1A]">
+                  Infrastructure Intelligence
+                </span>
+                <span className="text-xs font-bold text-[#7C7D75]">
+                  Public Sector Utilization Audit
+                </span>
+              </div>
+              <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-[#1C1D1A] tracking-tight">
+                The Anatomy of Unused Academic Spaces
               </h2>
             </div>
-            <p className="text-xs text-[#7C7D75] max-w-sm font-semibold">
-              Eliminating administrative gatekeeping through transparent digital auditing and verified civic quotas.
+            <p className="text-xs sm:text-sm text-[#7C7D75] font-semibold max-w-md">
+              Billions of dollars in taxpayer-funded scientific labs, high-performance computing, and event infrastructure sit dormant while community innovators struggle for access.
             </p>
           </div>
 
-          {/* 4 Pillars of the About Section */}
+          {/* 4 Big Macro Data Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div className="p-5 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-2.5">
-              <div className="h-10 w-10 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <Users className="h-5 w-5" />
+            <div className="p-6 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-display font-extrabold text-[#7C7D75] uppercase tracking-wider">Off-Peak Vacancy</span>
+                <TrendingDown className="h-4 w-4 text-[#DD700B]" />
               </div>
-              <h3 className="font-display font-extrabold text-sm text-[#1C1D1A]">
-                70% Civic Quota
-              </h3>
-              <p className="text-xs text-[#7C7D75] leading-relaxed font-semibold">
-                State college and research facilities reserve at least 70% of off-peak hours for verified educational NGOs, non-profits, and youth skill initiatives at ₹0 tariff.
+              <div className="font-display font-extrabold text-4xl text-[#1C1D1A]">68%</div>
+              <p className="text-xs text-[#7C7D75] font-semibold leading-relaxed">
+                Of university labs, testing benches, and cleanrooms sit completely unoccupied between 5 PM and 8 AM daily and throughout 14 weeks of annual recesses.
               </p>
             </div>
 
-            <div className="p-5 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-2.5">
-              <div className="h-10 w-10 rounded-2xl bg-[#D9DADF] border-2 border-[#1C1D1A] flex items-center justify-center text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <FileText className="h-5 w-5 text-[#DD700B]" />
+            <div className="p-6 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-display font-extrabold text-[#7C7D75] uppercase tracking-wider">Dormant Capital</span>
+                <AlertTriangle className="h-4 w-4 text-[#DD700B]" />
               </div>
-              <h3 className="font-display font-extrabold text-sm text-[#1C1D1A]">
-                Gazette-Backed Reasons
-              </h3>
-              <p className="text-xs text-[#7C7D75] leading-relaxed font-semibold">
-                Arbitrary administrative denials are prohibited under Section 21. Any rejection creates a public audit entry with verified statutory rationale.
+              <div className="font-display font-extrabold text-4xl text-[#DD700B]">₹34,000 Cr</div>
+              <p className="text-xs text-[#7C7D75] font-semibold leading-relaxed">
+                In specialized public equipment (5-axis CNCs, SEMs, mass spectrometers) suffers under-utilization, running at an average duty cycle of under 22%.
               </p>
             </div>
 
-            <div className="p-5 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-2.5">
-              <div className="h-10 w-10 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <Camera className="h-5 w-5" />
+            <div className="p-6 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-display font-extrabold text-[#7C7D75] uppercase tracking-wider">Dark Auditorium Days</span>
+                <Clock className="h-4 w-4 text-[#1C1D1A]" />
               </div>
-              <h3 className="font-display font-extrabold text-sm text-[#1C1D1A]">
-                Condition Proof Escrow
-              </h3>
-              <p className="text-xs text-[#7C7D75] leading-relaxed font-semibold">
-                Transparent pre-event check-in and post-event check-out photographs protect expensive scientific equipment and ensure instant dispute-free deposit refunds.
+              <div className="font-display font-extrabold text-4xl text-[#1C1D1A]">210 Days</div>
+              <p className="text-xs text-[#7C7D75] font-semibold leading-relaxed">
+                Average annual duration a state institution auditorium remains locked, creating high maintenance overhead with zero community utility.
               </p>
             </div>
 
-            <div className="p-5 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-2.5">
-              <div className="h-10 w-10 rounded-2xl bg-[#D9DADF] border-2 border-[#1C1D1A] flex items-center justify-center text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <ShieldCheck className="h-5 w-5 text-[#DD700B]" />
+            <div className="p-6 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-display font-extrabold text-[#7C7D75] uppercase tracking-wider">Grassroots Block</span>
+                <Users className="h-4 w-4 text-[#DD700B]" />
               </div>
-              <h3 className="font-display font-extrabold text-sm text-[#1C1D1A]">
-                ISO 27001 Sealed
-              </h3>
-              <p className="text-xs text-[#7C7D75] leading-relaxed font-semibold">
-                Every booking token, NOC upload, and Dean signature is cryptographically sealed in an immutable state ledger for supreme audit compliance.
+              <div className="font-display font-extrabold text-4xl text-[#1C1D1A]">78%</div>
+              <p className="text-xs text-[#7C7D75] font-semibold leading-relaxed">
+                Of youth skill NGOs, robotics clubs, and civic researchers report venue unavailability as their single largest obstacle to launching programs.
               </p>
             </div>
           </div>
         </section>
 
-        {/* ── SECTION 4: FEATURED FACILITIES & TESTING LABS ─────────────────── */}
-        <section id="featured-facilities" className="scroll-mt-24 space-y-6 pt-6 border-t-2 border-[#1C1D1A]/15">
+        {/* ── SECTION 3: DEEP-DIVE BY ASSET CATEGORY (UTILIZATION METERS) ──── */}
+        <section className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] p-6 sm:p-10 space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#1C1D1A] pb-5">
+            <div>
+              <span className="font-display font-extrabold text-xs text-[#DD700B] uppercase tracking-wider block">
+                Category Breakdown
+              </span>
+              <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-[#1C1D1A] tracking-tight">
+                Where The Idle Capacity Lives
+              </h3>
+            </div>
+            <span className="text-xs font-bold bg-[#D9DADF] text-[#1C1D1A] px-3.5 py-1.5 rounded-full border border-[#1C1D1A] self-start sm:self-auto">
+              Statewide Audit Aggregate
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Category 1 */}
+            <div className="p-6 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-10 w-10 rounded-xl bg-white border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                    <FlaskConical className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-extrabold text-base text-[#1C1D1A]">
+                      Biotech & Testing Suites
+                    </h4>
+                    <p className="text-[11px] text-[#7C7D75] font-semibold">
+                      Spectrometry, Centrifuges & Cleanrooms
+                    </p>
+                  </div>
+                </div>
+                <span className="font-display font-extrabold text-xl text-[#DD700B]">71% Idle</span>
+              </div>
+
+              {/* Progress Meter */}
+              <div className="space-y-1.5">
+                <div className="h-3 w-full bg-white rounded-full border-2 border-[#1C1D1A] overflow-hidden flex">
+                  <div className="bg-[#1C1D1A] h-full" style={{ width: '29%' }} title="Academic curriculum: 29%" />
+                  <div className="bg-[#DD700B] h-full" style={{ width: '71%' }} title="Idle off-peak capacity: 71%" />
+                </div>
+                <div className="flex justify-between text-[10px] font-bold text-[#7C7D75]">
+                  <span>Classroom Curriculum (29%)</span>
+                  <span className="text-[#DD700B] font-extrabold">Idle Capacity (71%)</span>
+                </div>
+              </div>
+
+              <p className="text-xs text-[#1C1D1A]/80 font-medium leading-relaxed">
+                High-containment suites and fume hoods incur ongoing 24/7 HVAC and calibration costs regardless of whether a student is present. Sharing idle hours unlocks high-tier research access for independent bio-hackers without adding overhead.
+              </p>
+            </div>
+
+            {/* Category 2 */}
+            <div className="p-6 rounded-2xl bg-[#D9DADF] border-2 border-[#1C1D1A] space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-10 w-10 rounded-xl bg-white border-2 border-[#1C1D1A] flex items-center justify-center text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                    <Cpu className="h-5 w-5 text-[#DD700B]" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-extrabold text-base text-[#1C1D1A]">
+                      AI Clusters & High-Compute Labs
+                    </h4>
+                    <p className="text-[11px] text-[#7C7D75] font-semibold">
+                      GPU Clusters & Workstation Enclaves
+                    </p>
+                  </div>
+                </div>
+                <span className="font-display font-extrabold text-xl text-[#1C1D1A]">64% Idle</span>
+              </div>
+
+              {/* Progress Meter */}
+              <div className="space-y-1.5">
+                <div className="h-3 w-full bg-white rounded-full border-2 border-[#1C1D1A] overflow-hidden flex">
+                  <div className="bg-[#1C1D1A] h-full" style={{ width: '36%' }} />
+                  <div className="bg-[#7C7D75] h-full" style={{ width: '64%' }} />
+                </div>
+                <div className="flex justify-between text-[10px] font-bold text-[#7C7D75]">
+                  <span>Lab Practical Classes (36%)</span>
+                  <span className="text-[#1C1D1A] font-extrabold">Idle Off-Peak Capacity (64%)</span>
+                </div>
+              </div>
+
+              <p className="text-xs text-[#1C1D1A]/80 font-medium leading-relaxed">
+                Modern engineering institutes maintain multi-core GPU clusters that sit powered-down over nights and breaks. Pooling this compute provides verified STEM non-profits and student startups with world-class machine learning infrastructure.
+              </p>
+            </div>
+
+            {/* Category 3 */}
+            <div className="p-6 rounded-2xl bg-[#D9DADF] border-2 border-[#1C1D1A] space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-10 w-10 rounded-xl bg-white border-2 border-[#1C1D1A] flex items-center justify-center text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                    <Building className="h-5 w-5 text-[#DD700B]" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-extrabold text-base text-[#1C1D1A]">
+                      Auditoriums & Central Halls
+                    </h4>
+                    <p className="text-[11px] text-[#7C7D75] font-semibold">
+                      400-1,200 Seat Keynote Theatres
+                    </p>
+                  </div>
+                </div>
+                <span className="font-display font-extrabold text-xl text-[#1C1D1A]">58% Idle</span>
+              </div>
+
+              {/* Progress Meter */}
+              <div className="space-y-1.5">
+                <div className="h-3 w-full bg-white rounded-full border-2 border-[#1C1D1A] overflow-hidden flex">
+                  <div className="bg-[#1C1D1A] h-full" style={{ width: '42%' }} />
+                  <div className="bg-[#ADACA7] h-full" style={{ width: '58%' }} />
+                </div>
+                <div className="flex justify-between text-[10px] font-bold text-[#7C7D75]">
+                  <span>Annual College Events (42%)</span>
+                  <span className="text-[#1C1D1A] font-extrabold">Unused Dark Days (58%)</span>
+                </div>
+              </div>
+
+              <p className="text-xs text-[#1C1D1A]/80 font-medium leading-relaxed">
+                College auditoriums are rarely scheduled outside of annual fests and convocation weekends. Releasing these venues during mid-term recesses provides civic NGOs and educational summits with dignified public space at zero tariff.
+              </p>
+            </div>
+
+            {/* Category 4 */}
+            <div className="p-6 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-10 w-10 rounded-xl bg-white border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                    <Activity className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-extrabold text-base text-[#1C1D1A]">
+                      Multi-Sport Stadiums & Grounds
+                    </h4>
+                    <p className="text-[11px] text-[#7C7D75] font-semibold">
+                      Turfs, Synthetic Tracks & Courts
+                    </p>
+                  </div>
+                </div>
+                <span className="font-display font-extrabold text-xl text-[#DD700B]">52% Idle</span>
+              </div>
+
+              {/* Progress Meter */}
+              <div className="space-y-1.5">
+                <div className="h-3 w-full bg-white rounded-full border-2 border-[#1C1D1A] overflow-hidden flex">
+                  <div className="bg-[#1C1D1A] h-full" style={{ width: '48%' }} />
+                  <div className="bg-[#DD700B] h-full" style={{ width: '52%' }} />
+                </div>
+                <div className="flex justify-between text-[10px] font-bold text-[#7C7D75]">
+                  <span>Campus Sports (48%)</span>
+                  <span className="text-[#DD700B] font-extrabold">Unbooked Community Windows (52%)</span>
+                </div>
+              </div>
+
+              <p className="text-xs text-[#1C1D1A]/80 font-medium leading-relaxed">
+                Gated campus fields sit empty across weekends while local youth athletics leagues and disability sports organizations are forced to compete in substandard public spaces.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECTION 4: THE DORMANT COST VS IDLESPACES IMPACT ─────────────── */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-8 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-4">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] text-[10px] font-display font-extrabold uppercase">
+              The Status Quo Dilemma
+            </div>
+            <h3 className="font-display font-extrabold text-2xl text-[#1C1D1A] tracking-tight">
+              The Real Cost of Dormant Infrastructure
+            </h3>
+            <ul className="space-y-3 text-xs text-[#1C1D1A]/85 font-semibold">
+              <li className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-[#D9DADF] text-[#1C1D1A] flex items-center justify-center shrink-0 font-bold">✕</span>
+                <span><strong>Mechanical Deterioration:</strong> Inactive precision laboratory instruments (CNCs, optic lasers, vacuum chambers) seize and fall out of calibration faster when idle.</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-[#D9DADF] text-[#1C1D1A] flex items-center justify-center shrink-0 font-bold">✕</span>
+                <span><strong>Unchecked Gatekeeping:</strong> Without statutory oversight, room allocation is governed by bureaucratic whim and informal favors rather than transparent public merit.</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-[#D9DADF] text-[#1C1D1A] flex items-center justify-center shrink-0 font-bold">✕</span>
+                <span><strong>Taxpayer Inefficiency:</strong> Hundreds of crores in public capital outlays produce zero civic return outside narrow classroom semester calendars.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="p-8 rounded-3xl bg-[#FCF8D8] border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-4">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#DD700B] text-white text-[10px] font-display font-extrabold uppercase">
+              The IdleSpaces Transformation
+            </div>
+            <h3 className="font-display font-extrabold text-2xl text-[#1C1D1A] tracking-tight">
+              The Statutory Sharing Multiplier
+            </h3>
+            <ul className="space-y-3 text-xs text-[#1C1D1A]/85 font-semibold">
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-5 w-5 text-[#DD700B] shrink-0" />
+                <span><strong>70% Protected Civic Access:</strong> Guaranteed statutory quota ensures grassroots community organizations receive priority access at ₹0 booking tariff.</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-5 w-5 text-[#DD700B] shrink-0" />
+                <span><strong>48-Hour SLA Adjudication:</strong> Mandates prompt institutional review with immutable gazette-backed reason logging under Section 21.</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-5 w-5 text-[#DD700B] shrink-0" />
+                <span><strong>Condition Proof Escrow:</strong> Digital check-in and check-out photos eliminate damage disputes and protect multi-crore equipment automatically.</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ── SECTION 5: LIVE FEATURED FACILITIES ──────────────────────────── */}
+        <section className="space-y-6 pt-6 border-t-2 border-[#1C1D1A]/15">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
             <div>
               <div className="inline-flex items-center gap-2 mb-1">
@@ -447,11 +511,11 @@ export default function CalmIdleSpacesHome() {
                   Verified Catalog
                 </span>
                 <span className="text-xs font-bold text-[#7C7D75]">
-                  Higher Education Assets
+                  Higher Education Assets Available for Booking
                 </span>
               </div>
               <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-[#1C1D1A] tracking-tight">
-                Featured Facilities & Testing Labs
+                Featured Available Facilities
               </h2>
             </div>
 
@@ -525,6 +589,42 @@ export default function CalmIdleSpacesHome() {
             })}
           </div>
         </section>
+
+        {/* ── SECTION 6: EXPLORE HOW IT WORKS OR ABOUT BANNER ──────────────── */}
+        <section className="p-8 sm:p-10 rounded-3xl bg-[#1C1D1A] text-[#FCF8D8] border-2 border-[#1C1D1A] shadow-[6px_6px_0px_0px_#DD700B] flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 max-w-xl text-center lg:text-left">
+            <span className="text-xs font-display font-extrabold text-[#DD700B] uppercase tracking-wider block">
+              Transparent Statutory Protocol
+            </span>
+            <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-[#FCF8D8] tracking-tight">
+              Ready to See How It Works in Practice?
+            </h3>
+            <p className="text-xs sm:text-sm text-[#D9DADF] font-semibold leading-relaxed">
+              Explore the complete 3-step statutory lifecycle, learn about the anti-corruption mandate, or browse our verified public catalogue.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+            <Link href="/how-it-works">
+              <button
+                type="button"
+                className="bg-[#DD700B] hover:bg-[#c96205] text-white font-display font-extrabold text-xs sm:text-sm py-3 px-5 rounded-2xl border-2 border-white shadow-[2px_2px_0px_0px_white] flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5"
+              >
+                <span>Read How It Works</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </Link>
+
+            <Link href="/about">
+              <button
+                type="button"
+                className="bg-[#FCF8D8] hover:bg-white text-[#1C1D1A] font-display font-extrabold text-xs sm:text-sm py-3 px-5 rounded-2xl border-2 border-white flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5"
+              >
+                <span>About IdleSpaces</span>
+              </button>
+            </Link>
+          </div>
+        </section>
       </main>
 
       {/* ── CLEAN GROUNDED FOOTER ────────────────────────────────────────── */}
@@ -537,8 +637,8 @@ export default function CalmIdleSpacesHome() {
 
           <div className="flex items-center gap-4 text-[#1C1D1A]">
             <Link href="/discover" className="hover:text-[#DD700B] transition-colors">Catalog</Link>
-            <Link href="/admin" className="hover:text-[#DD700B] transition-colors">Dean Review</Link>
-            <Link href="/bookings" className="hover:text-[#DD700B] transition-colors">Check-In Proof</Link>
+            <Link href="/how-it-works" className="hover:text-[#DD700B] transition-colors">How It Works</Link>
+            <Link href="/about" className="hover:text-[#DD700B] transition-colors">About</Link>
             <Link href="/user/login" className="hover:text-[#DD700B] transition-colors">User Portal</Link>
           </div>
         </div>

@@ -15,6 +15,8 @@ import {
   LogIn,
   ChevronDown,
   ArrowUpRight,
+  Sparkles,
+  HelpCircle,
 } from 'lucide-react';
 
 export function Navbar() {
@@ -24,29 +26,37 @@ export function Navbar() {
 
   const navLinks = [
     {
-      num: '01',
       name: 'Discover',
       href: '/discover',
       icon: Building,
-      badge: 'Request',
       activeColor: 'bg-[#DD700B] text-white',
       requiresAdmin: false,
     },
     {
-      num: '02',
+      name: 'How It Works',
+      href: '/how-it-works',
+      icon: Sparkles,
+      activeColor: 'bg-[#1C1D1A] text-[#FCF8D8]',
+      requiresAdmin: false,
+    },
+    {
+      name: 'About',
+      href: '/about',
+      icon: HelpCircle,
+      activeColor: 'bg-[#1C1D1A] text-[#FCF8D8]',
+      requiresAdmin: false,
+    },
+    {
       name: 'Dean Review',
       href: '/admin',
       icon: ShieldCheck,
-      badge: 'Ledger',
       activeColor: 'bg-[#7C7D75] text-[#FCF8D8]',
       requiresAdmin: true,
     },
     {
-      num: '03',
       name: 'Check-In Proof',
       href: '/bookings',
       icon: CalendarCheck2,
-      badge: 'Proof',
       activeColor: 'bg-[#ADACA7] text-[#1C1D1A]',
       requiresAdmin: false,
     },
@@ -62,13 +72,10 @@ export function Navbar() {
               idlespaces.
             </span>
             <span className="h-2.5 w-2.5 rounded-full bg-[#DD700B] animate-pulse" />
-            <span className="hidden sm:inline-block text-[10px] font-display font-bold px-2 py-0.5 rounded-full bg-[#1C1D1A] text-[#FCF8D8] uppercase tracking-wider ml-1">
-              Public Portal
-            </span>
           </Link>
 
           {/* Navigation Links */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="hidden md:flex items-center gap-1.5 sm:gap-2">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive =
@@ -79,7 +86,7 @@ export function Navbar() {
               return (
                 <Link key={link.href} href={link.href}>
                   <div
-                    className={`flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-2xl text-xs font-display font-bold border-2 transition-all cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-xs font-display font-bold border-2 transition-all cursor-pointer ${
                       isActive
                         ? `${link.activeColor} border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]`
                         : 'bg-transparent text-[#1C1D1A] border-transparent hover:border-[#1C1D1A] hover:bg-[#D9DADF]'
