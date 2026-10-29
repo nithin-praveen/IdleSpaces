@@ -3,30 +3,30 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl text-xs sm:text-sm font-display font-extrabold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer border-2 border-[#1C1D1A]',
   {
     variants: {
       variant: {
         default:
-          'bg-slate-900 text-white shadow hover:bg-slate-800 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-200',
+          'bg-[#DD700B] text-white shadow-[2px_2px_0px_0px_#1C1D1A] hover:bg-[#c96205] hover:-translate-y-0.5',
         gov:
-          'bg-blue-900 text-white shadow hover:bg-blue-800 active:bg-blue-950 border border-blue-950 font-semibold',
+          'bg-[#DD700B] text-white shadow-[2px_2px_0px_0px_#1C1D1A] hover:bg-[#c96205] hover:-translate-y-0.5',
         destructive:
-          'bg-red-600 text-white shadow-sm hover:bg-red-700 dark:bg-red-900 dark:text-red-100 dark:hover:bg-red-800',
+          'bg-[#DD700B] text-white shadow-[2px_2px_0px_0px_#1C1D1A] hover:bg-red-700 hover:-translate-y-0.5',
         outline:
-          'border border-slate-300 bg-white text-slate-800 shadow-sm hover:bg-slate-100 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800',
+          'border-2 border-[#1C1D1A] bg-white text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] hover:bg-[#D9DADF] hover:-translate-y-0.5',
         secondary:
-          'bg-slate-100 text-slate-900 shadow-sm hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700',
+          'bg-[#D9DADF] text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] hover:bg-[#ADACA7] hover:-translate-y-0.5',
         ghost:
-          'hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-100',
+          'border-transparent hover:border-[#1C1D1A] hover:bg-[#D9DADF] text-[#1C1D1A]',
         link:
-          'text-blue-700 underline-offset-4 hover:underline dark:text-blue-400',
+          'border-transparent text-[#DD700B] underline-offset-4 hover:underline',
       },
       size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-11 rounded-md px-8 text-base',
-        icon: 'h-9 w-9',
+        default: 'h-11 px-5 py-2.5',
+        sm: 'h-9 px-3.5 text-xs',
+        lg: 'h-12 px-8 text-base',
+        icon: 'h-9 w-9 p-0',
       },
     },
     defaultVariants: {

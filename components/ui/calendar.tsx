@@ -62,13 +62,13 @@ export function Calendar({
   return (
     <div
       className={cn(
-        'p-3 border border-slate-200 rounded-xl bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900 select-none w-full max-w-[320px]',
+        'p-3 border-2 border-[#1C1D1A] rounded-2xl bg-white shadow-[3px_3px_0px_0px_#1C1D1A] select-none w-full max-w-[320px]',
         className
       )}
     >
       {/* Month Navigation */}
       <div className="flex items-center justify-between px-1 py-1 mb-2">
-        <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+        <h4 className="text-sm font-display font-extrabold text-[#1C1D1A]">
           {format(currentMonth, 'MMMM yyyy')}
         </h4>
         <div className="flex items-center space-x-1">
@@ -76,7 +76,7 @@ export function Calendar({
             type="button"
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+            className="h-7 w-7 text-[#1C1D1A] hover:bg-[#D9DADF] rounded-lg"
             onClick={prevMonth}
             aria-label="Previous month"
           >
@@ -86,7 +86,7 @@ export function Calendar({
             type="button"
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+            className="h-7 w-7 text-[#1C1D1A] hover:bg-[#D9DADF] rounded-lg"
             onClick={nextMonth}
             aria-label="Next month"
           >
@@ -96,7 +96,7 @@ export function Calendar({
       </div>
 
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
+      <div className="grid grid-cols-7 gap-1 text-center text-xs font-display font-extrabold text-[#7C7D75] mb-1">
         {weekDays.map((d) => (
           <div key={d} className="h-7 flex items-center justify-center">
             {d}
@@ -121,11 +121,11 @@ export function Calendar({
               disabled={disabled}
               onClick={() => onSelect?.(day)}
               className={cn(
-                'h-8 w-8 mx-auto flex items-center justify-center rounded-lg text-xs font-medium transition-colors cursor-pointer',
-                !isCurrentMonth && 'text-slate-300 dark:text-slate-700 pointer-events-none',
-                isCurrentMonth && !isSelected && 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-                isCurrentDay && !isSelected && 'border border-blue-500 font-bold text-blue-600 dark:text-blue-400',
-                isSelected && 'bg-blue-900 text-white font-semibold hover:bg-blue-800 shadow-sm',
+                'h-8 w-8 mx-auto flex items-center justify-center rounded-xl text-xs font-bold transition-all cursor-pointer border',
+                !isCurrentMonth && 'text-[#ADACA7] border-transparent pointer-events-none',
+                isCurrentMonth && !isSelected && 'text-[#1C1D1A] border-transparent hover:bg-[#D9DADF]',
+                isCurrentDay && !isSelected && 'border-[#DD700B] font-extrabold text-[#DD700B] bg-[#DD700B]/10',
+                isSelected && 'bg-[#DD700B] text-white font-extrabold border-[#1C1D1A] shadow-[1px_1px_0px_#1C1D1A]',
                 disabled && 'opacity-30 cursor-not-allowed pointer-events-none'
               )}
             >
@@ -164,7 +164,7 @@ export function DatePicker({
         min={minDate}
         required={required}
         onChange={(e) => onChange(e.target.value)}
-        className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:border-blue-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 cursor-pointer"
+        className="flex h-11 w-full rounded-2xl border-2 border-[#1C1D1A] bg-[#FCF8D8]/50 px-3.5 py-2 text-xs sm:text-sm text-[#1C1D1A] font-semibold focus:outline-hidden focus:border-[#DD700B] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
       />
     </div>
   );
