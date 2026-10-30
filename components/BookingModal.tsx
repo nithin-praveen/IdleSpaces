@@ -82,6 +82,7 @@ export function BookingModal({
   if (!space) return null;
 
   const alreadyRequested = isSpaceRequested(space);
+  const isDean = user?.role === 'admin';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -94,6 +95,12 @@ export function BookingModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Guard: Deans are service providers and cannot submit booking requests
+    if (isDean) {
+      setErrorMessage('Deans are facility providers and cannot submit booking requests.');
+      return;
+    }
 
     if (!selectedFile && !mockFileUploaded) {
       setErrorMessage('A valid NGO Registration Certificate or Corporate NOC is statutory required.');
@@ -187,7 +194,29 @@ export function BookingModal({
           </span>
         </div>
 
-        {successData ? (
+        {isDean ? (
+          /* Dean: cannot request access notice */
+          <div className="modal-scroll flex-1 p-6 sm:p-8 space-y-6 text-center">
+            <div className="mx-auto h-16 w-16 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B] shadow-[2px_2px_0px_0px_#1C1D1A]">
+              <ShieldCheck className="h-9 w-9" />
+            </div>
+            <DialogTitle className="text-2xl font-display font-extrabold text-[#1C1D1A]">
+              Dean Provider Mode Active
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#7C7D75] max-w-md mx-auto font-semibold">
+              As a verified College Dean, you are the statutory service provider managing institutional assets. Deans rent out facilities and do not submit access requests. You can post new facilities or adjudicate incoming applications under Dean Review.
+            </DialogDescription>
+            <div className="pt-2">
+              <button
+                type="button"
+                className="px-8 py-3 bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs rounded-2xl border-2 border-[#1C1D1A] cursor-pointer"
+                onClick={onClose}
+              >
+                Close & Return
+              </button>
+            </div>
+          </div>
+        ) : successData ? (
           /* Success Screen */
           <div className="modal-scroll flex-1 p-6 sm:p-8 space-y-6">
             <div className="text-center space-y-3">

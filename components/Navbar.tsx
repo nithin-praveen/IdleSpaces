@@ -62,6 +62,11 @@ export function Navbar() {
     },
   ];
 
+  // Only show Dean Review to users who are logged in as admin/dean
+  const visibleNavLinks = navLinks.filter(
+    (link) => !link.requiresAdmin || user?.role === 'admin'
+  );
+
   return (
     <nav className="sticky top-0 z-40 border-b-2 border-[#1C1D1A] bg-[#FCF8D8]/95 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,9 +79,9 @@ export function Navbar() {
             <span className="h-2.5 w-2.5 rounded-full bg-[#DD700B] animate-pulse" />
           </Link>
 
-          {/* Navigation Links */}
+          {/* Navigation Links (Filtered strictly by role) */}
           <div className="hidden md:flex items-center gap-1.5 sm:gap-2">
-            {navLinks.map((link) => {
+            {visibleNavLinks.map((link) => {
               const Icon = link.icon;
               const isActive =
                 pathname === link.href ||
@@ -111,7 +116,7 @@ export function Navbar() {
                     className="flex items-center gap-2 p-1 sm:px-2.5 sm:py-1 rounded-2xl bg-[#D9DADF] hover:bg-[#c7c9cf] border-2 border-[#1C1D1A] text-left transition-colors cursor-pointer"
                   >
                     <div className="h-6 w-6 rounded-full bg-[#1C1D1A] text-[#FCF8D8] flex items-center justify-center font-bold text-[10px]">
-                      {user.role === 'admin' ? 'AD' : user.role === 'ngo' ? 'NG' : 'CP'}
+                      {user.role === 'admin' ? 'DEAN' : user.role === 'ngo' ? 'NGO' : 'USER'}
                     </div>
                     <div className="hidden lg:block text-left">
                       <div className="flex items-center gap-1.5">
@@ -119,7 +124,7 @@ export function Navbar() {
                           {user.name.split(' ')[0]}
                         </span>
                         <span className="text-[9px] font-extrabold uppercase px-1 rounded bg-[#1C1D1A] text-white">
-                          {user.role}
+                          {user.role === 'admin' ? 'Dean (Provider)' : user.role === 'ngo' ? 'NGO (Requester)' : user.role}
                         </span>
                       </div>
                     </div>
@@ -137,7 +142,9 @@ export function Navbar() {
                         <p className="text-[10px] text-[#7C7D75] font-mono">{user.email}</p>
                         <div className="flex items-center gap-1.5 mt-1">
                           <span className="h-1.5 w-1.5 rounded-full bg-[#DD700B]" />
-                          <span className="text-[10px] text-[#DD700B] font-bold">Session Active (Encrypted)</span>
+                          <span className="text-[10px] text-[#DD700B] font-bold">
+                            {user.role === 'admin' ? 'Service Provider (Dean)' : 'Civic Requester (NGO/User)'}
+                          </span>
                         </div>
                       </div>
 
@@ -147,50 +154,34 @@ export function Navbar() {
                         </p>
                         <button
                           type="button"
-                          onClick={async () => {
-                            await switchDemoRole('admin');
+                          onClick={() => {
+                            switchDemoRole('ngo');
                             setRoleMenuOpen(false);
                           }}
-                          className={`w-full text-left px-2.5 py-1.5 text-xs rounded-xl flex items-center justify-between font-display font-bold ${
-                            user.role === 'admin'
-                              ? 'bg-[#7C7D75] text-[#FCF8D8]'
-                              : 'text-[#1C1D1A] hover:bg-[#D9DADF]'
-                          }`}
-                        >
-                          <span>Institutional Admin (Dean)</span>
-                          {user.role === 'admin' && <span className="text-[10px]">Active</span>}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            await switchDemoRole('ngo');
-                            setRoleMenuOpen(false);
-                          }}
-                          className={`w-full text-left px-2.5 py-1.5 text-xs rounded-xl flex items-center justify-between font-display font-bold ${
+                          className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center justify-between ${
                             user.role === 'ngo'
                               ? 'bg-[#DD700B] text-white'
-                              : 'text-[#1C1D1A] hover:bg-[#D9DADF]'
+                              : 'hover:bg-black/10 text-[#1C1D1A]'
                           }`}
                         >
-                          <span>Tier 1 NGO Officer</span>
+                          <span>NGO / Normal User (Requester)</span>
                           {user.role === 'ngo' && <span className="text-[10px]">Active</span>}
                         </button>
 
                         <button
                           type="button"
-                          onClick={async () => {
-                            await switchDemoRole('corporate');
+                          onClick={() => {
+                            switchDemoRole('admin');
                             setRoleMenuOpen(false);
                           }}
-                          className={`w-full text-left px-2.5 py-1.5 text-xs rounded-xl flex items-center justify-between font-display font-bold ${
-                            user.role === 'corporate'
-                              ? 'bg-[#ADACA7] text-[#1C1D1A]'
-                              : 'text-[#1C1D1A] hover:bg-[#D9DADF]'
+                          className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center justify-between mt-0.5 ${
+                            user.role === 'admin'
+                              ? 'bg-[#7C7D75] text-[#FCF8D8]'
+                              : 'hover:bg-black/10 text-[#1C1D1A]'
                           }`}
                         >
-                          <span>Tier 2 Corporate CSR</span>
-                          {user.role === 'corporate' && <span className="text-[10px]">Active</span>}
+                          <span>College Dean (Provider)</span>
+                          {user.role === 'admin' && <span className="text-[10px]">Active</span>}
                         </button>
                       </div>
 

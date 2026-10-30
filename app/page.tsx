@@ -87,6 +87,10 @@ export default function CalmIdleSpacesHome() {
   }, []);
 
   const handleOpenBooking = (space: Space) => {
+    if (user?.role === 'admin') {
+      setIsListModalOpen(true);
+      return;
+    }
     if (requestedSpaceIds.includes(space.id) || isSpaceRequested(space)) {
       return;
     }
@@ -131,51 +135,56 @@ export default function CalmIdleSpacesHome() {
               About
             </Link>
 
-            {/* Always visible or highlighted Dean Review link */}
-            <Link
-              href="/admin"
-              className={`py-1.5 px-3 rounded-2xl border-2 transition-all flex items-center gap-1.5 cursor-pointer ${
-                user?.role === 'admin'
-                  ? 'bg-[#1C1D1A] text-[#FCF8D8] border-[#1C1D1A] shadow-[2px_2px_0px_0px_#DD700B]'
-                  : 'hover:border-[#1C1D1A] hover:bg-[#D9DADF] text-[#1C1D1A] border-transparent'
-              }`}
-            >
-              <ShieldCheck className="h-3.5 w-3.5 text-[#DD700B]" />
-              <span>Dean Review</span>
-              <span className="px-1.5 py-0.2 rounded-md bg-[#DD700B] text-white text-[9px] font-extrabold">
-                4
-              </span>
-            </Link>
+            {/* Dean Review link (only visible for deans/admins) */}
+            {user?.role === 'admin' && (
+              <Link
+                href="/admin"
+                className="py-1.5 px-3 rounded-2xl border-2 transition-all flex items-center gap-1.5 cursor-pointer bg-[#1C1D1A] text-[#FCF8D8] border-[#1C1D1A] shadow-[2px_2px_0px_0px_#DD700B]"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 text-[#DD700B]" />
+                <span>Dean Review</span>
+                <span className="px-1.5 py-0.2 rounded-md bg-[#DD700B] text-white text-[9px] font-extrabold">
+                  4
+                </span>
+              </Link>
+            )}
           </nav>
 
-          {/* Top Right: User Login & Dean SSO */}
+          {/* Top Right: User Login & Dean Actions */}
           <div className="flex items-center gap-2">
             {user ? (
               <div className="flex items-center gap-2">
-                <Link
-                  href={user.role === 'admin' ? '/admin' : '/discover'}
-                  className="flex items-center gap-2 bg-[#D9DADF] hover:bg-[#c7c9cf] p-1 sm:px-3 sm:py-1 rounded-2xl border-2 border-[#1C1D1A] transition-colors cursor-pointer"
-                  title="Go to Dashboard"
-                >
+                {user.role === 'admin' && (
+                  <Link href="/admin">
+                    <button
+                      type="button"
+                      className="bg-[#7C7D75] hover:bg-[#686962] text-[#FCF8D8] text-xs font-display font-bold py-1.5 px-3 rounded-xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center gap-1.5 cursor-pointer transition-all hover:-translate-y-0.5"
+                    >
+                      <ShieldCheck className="h-3.5 w-3.5 text-[#DD700B]" />
+                      <span className="hidden sm:inline">Dean Review</span>
+                      <span className="sm:hidden">Review</span>
+                    </button>
+                  </Link>
+                )}
+                <div className="flex items-center gap-2 bg-[#D9DADF] p-1 sm:px-3 sm:py-1 rounded-2xl border-2 border-[#1C1D1A]">
                   <div className="h-6 w-6 rounded-full bg-[#1C1D1A] text-[#FCF8D8] flex items-center justify-center font-bold text-[10px]">
-                    {user.role === 'admin' ? 'AD' : user.role === 'ngo' ? 'NG' : 'CP'}
+                    {user.role === 'admin' ? 'DEAN' : user.role === 'ngo' ? 'NGO' : 'USER'}
                   </div>
                   <div className="hidden sm:block text-left leading-none">
                     <span className="text-xs font-bold text-[#1C1D1A] block">{user.name.split(' ')[0]}</span>
                     <span className="text-[9px] font-extrabold uppercase text-[#7C7D75]">
-                      {user.role === 'admin' ? 'DEAN ADMIN' : user.role}
+                      {user.role === 'admin' ? 'Provider' : 'Requester'}
                     </span>
                   </div>
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => logout()}
-                  className="p-2 rounded-xl bg-white hover:bg-[#D9DADF] border-2 border-[#1C1D1A] text-[#1C1D1A] transition-colors cursor-pointer"
-                  title="Sign Out"
-                >
-                  <LogOut className="h-3.5 w-3.5" />
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => logout()}
+                    className="p-1 rounded-lg hover:bg-black/10 text-[#1C1D1A] transition-colors cursor-pointer"
+                    title="Sign Out"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-1.5 sm:gap-2">
@@ -226,23 +235,29 @@ export default function CalmIdleSpacesHome() {
                   className="bg-[#DD700B] hover:bg-[#c25e04] text-white font-display font-extrabold text-sm py-3 px-5 rounded-2xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] flex items-center gap-2 transition-all hover:-translate-y-0.5 cursor-pointer"
                 >
                   <Search className="h-4 w-4" />
-                  <span>Explore Available Assets</span>
+                  <span>{user?.role === 'admin' ? 'Manage & Rent Out Catalog' : 'Explore Available Assets'}</span>
                 </button>
               </Link>
 
-              {/* List Idle Facility: Appears ONLY when Dean is authenticated */}
-              {user?.role === 'admin' && (
+{user?.role === 'admin' ? (
                 <button
                   type="button"
                   onClick={() => setIsListModalOpen(true)}
-                  className="bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-sm py-3 px-5 rounded-2xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] flex items-center gap-2 transition-all hover:-translate-y-0.5 cursor-pointer animate-in fade-in"
+                  className="bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-sm py-3 px-5 rounded-2xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] flex items-center gap-2 transition-all hover:-translate-y-0.5 cursor-pointer"
                 >
+                  <span>Rent Out Facility</span>
                   <Plus className="h-4 w-4 text-[#DD700B]" />
-                  <span>List Idle Facility</span>
-                  <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-[#1C1D1A] text-[#FCF8D8]">
-                    Dean
-                  </span>
                 </button>
+              ) : (
+                <Link href="/how-it-works">
+                  <button
+                    type="button"
+                    className="bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-sm py-3 px-5 rounded-2xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] flex items-center gap-2 transition-all hover:-translate-y-0.5 cursor-pointer"
+                  >
+                    <span>How It Works</span>
+                    <ArrowRight className="h-4 w-4 text-[#DD700B]" />
+                  </button>
+                </Link>
               )}
             </div>
 
@@ -629,14 +644,24 @@ export default function CalmIdleSpacesHome() {
                   <div className="pt-4 border-t-2 border-[#1C1D1A]/20 flex items-center justify-between gap-2">
                     <div>
                       <span className="text-[10px] uppercase font-bold text-[#DD700B] block">
-                        Tier 1 NGO
+                        {user?.role === 'admin' ? 'Provider Quota' : 'Tier 1 NGO'}
                       </span>
                       <span className="text-xs font-bold text-[#1C1D1A]">
-                        ₹0 Fee Allocation
+                        {user?.role === 'admin' ? 'Open for Lease' : '₹0 Fee Allocation'}
                       </span>
                     </div>
 
-                    {isRequested ? (
+                    {user?.role === 'admin' ? (
+                      <button
+                        type="button"
+                        onClick={() => setIsListModalOpen(true)}
+                        className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-2 px-3.5 rounded-xl border-2 border-[#1C1D1A] flex items-center gap-1.5 transition-all cursor-pointer"
+                        title="Rent out or manage slots for this facility"
+                      >
+                        <Plus className="h-3.5 w-3.5 text-[#DD700B]" />
+                        <span>Rent Out Space</span>
+                      </button>
+                    ) : isRequested ? (
                       <button
                         type="button"
                         disabled
@@ -713,6 +738,9 @@ export default function CalmIdleSpacesHome() {
             <Link href="/admin" className="hover:text-[#DD700B] transition-colors">Dean Review</Link>
             <Link href="/how-it-works" className="hover:text-[#DD700B] transition-colors">How It Works</Link>
             <Link href="/about" className="hover:text-[#DD700B] transition-colors">About</Link>
+            {user?.role === 'admin' && (
+              <Link href="/admin" className="hover:text-[#DD700B] transition-colors">Dean Review</Link>
+            )}
             <Link href="/user/login" className="hover:text-[#DD700B] transition-colors">User Portal</Link>
           </div>
         </div>

@@ -88,3 +88,4 @@ export function markSpaceAsRequested(
     console.error('[markSpaceAsRequested] Error storing requested space:', err);
   }
 }
+

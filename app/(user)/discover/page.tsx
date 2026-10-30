@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { SpaceCard } from '@/components/SpaceCard';
 import { BookingModal } from '@/components/BookingModal';
+import { ListSpaceModal } from '@/components/ListSpaceModal';
 import { Navbar } from '@/components/Navbar';
 import { getSpaces } from '@/app/actions';
 import type { Space, SpaceType } from '@/types/database';
@@ -13,8 +14,11 @@ import {
   Monitor,
   Trophy,
   CheckCircle2,
+  Plus,
+  ArrowRight,
 } from 'lucide-react';
 import { getRequestedSpaceRecords, isSpaceRequested } from '@/lib/requested-spaces';
+import { useAuth } from '@/components/AuthProvider';
 
 const DEFAULT_SPACES: Space[] = [
   {
@@ -74,9 +78,13 @@ const DEFAULT_SPACES: Space[] = [
 ];
 
 export default function DiscoverSpacesPage() {
+  const { user } = useAuth();
+  const isDean = user?.role === 'admin';
+
   const [spaces, setSpaces] = React.useState<Space[]>(DEFAULT_SPACES);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [selectedSpace, setSelectedSpace] = React.useState<Space | null>(null);
+  const [isListModalOpen, setIsListModalOpen] = React.useState<boolean>(false);
 
   const [searchQuery, setSearchQuery] = React.useState<string>('');
   const [selectedType, setSelectedType] = React.useState<'all' | SpaceType>('all');
@@ -145,6 +153,9 @@ export default function DiscoverSpacesPage() {
   };
 
   const handleRequestClick = (space: Space) => {
+    // If user is a Dean, they cannot request access
+    if (isDean) return;
+
     // If already requested, disallow opening the modal
     if (requestedSpaceIds.includes(space.id) || isSpaceRequested(space)) {
       return;
@@ -152,49 +163,98 @@ export default function DiscoverSpacesPage() {
     setSelectedSpace(space);
   };
 
+  const handleSpaceListed = (newSpace: {
+    id: string;
+    name: string;
+    type: 'auditorium' | 'computer_lab' | 'ground';
+    capacity: number;
+    location: string;
+  }) => {
+    setSpaces((prev) => [
+      {
+        id: newSpace.id,
+        name: newSpace.name,
+        type: newSpace.type,
+        capacity: newSpace.capacity,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      ...prev,
+    ]);
+  };
+
   return (
     <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] font-body selection:bg-[#DD700B] selection:text-white flex flex-col justify-between">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1 w-full">
-        {/* Banner with Trust & Anti-Corruption SLA */}
-        <section className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] p-6 sm:p-8 space-y-4">
-          <div className="space-y-3 max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#D9DADF] px-3.5 py-1.5 text-xs font-bold text-[#1C1D1A] border-2 border-[#1C1D1A]">
-              <span className="h-2 w-2 rounded-full bg-[#DD700B] animate-pulse" />
-              <span>Public Asset Transparency Mandate • Zero Arbitrary Denials</span>
+        {/* ── CONDITIONAL BANNER: DEAN PROVIDER MODE VS PUBLIC APPLICANT MODE ── */}
+        {isDean ? (
+          <section className="bg-[#1C1D1A] text-[#FCF8D8] rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#DD700B] p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#7C7D75] px-3.5 py-1 text-xs font-bold text-[#FCF8D8] border border-white/20">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#DD700B]" />
+                <span>Dean Administrative Custodian Mode • Service Provider</span>
+              </div>
+              <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-[#FCF8D8] tracking-tight leading-tight">
+                Rent Out College Halls & Infrastructure
+              </h1>
+              <p className="text-xs sm:text-sm text-[#D9DADF] font-medium leading-relaxed">
+                As Dean, you provide the service. Register vacant auditoriums, computing labs, and stadiums to rent them out to grassroots NGOs and research bodies. Review incoming bookings under Dean Review.
+              </p>
             </div>
-            <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-[#1C1D1A] tracking-tight leading-tight">
-              Fair Allocation of Government College Infrastructure
-            </h1>
-            <p className="text-sm sm:text-base text-[#1C1D1A]/85 font-medium leading-relaxed max-w-2xl">
-              Discover and request access to vacant auditoriums, high-performance computing centers, and sports arenas. Tier 1 quota grants subsidized access to certified non-governmental community organizations.
-            </p>
 
-            {/* Quick Metrics Bento */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3">
-              <div className="rounded-2xl bg-[#FCF8D8] p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <p className="text-[10px] uppercase font-extrabold text-[#7C7D75]">Listed Assets</p>
-                <p className="font-display text-xl font-extrabold text-[#1C1D1A]">{spaces.length} Spaces</p>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full md:w-auto">
+              <button
+                type="button"
+                onClick={() => setIsListModalOpen(true)}
+                className="bg-[#DD700B] hover:bg-[#c96205] text-white font-display font-extrabold text-xs sm:text-sm py-3 px-6 rounded-2xl border-2 border-white shadow-[3px_3px_0px_0px_white] flex items-center justify-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Rent Out New Hall / Facility</span>
+              </button>
+            </div>
+          </section>
+        ) : (
+          <section className="bg-white rounded-3xl border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] p-6 sm:p-8 space-y-4">
+            <div className="space-y-3 max-w-3xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#D9DADF] px-3.5 py-1.5 text-xs font-bold text-[#1C1D1A] border-2 border-[#1C1D1A]">
+                <span className="h-2 w-2 rounded-full bg-[#DD700B] animate-pulse" />
+                <span>Public Asset Transparency Mandate • Zero Arbitrary Denials</span>
               </div>
-              <div className="rounded-2xl bg-[#DD700B] text-white p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <p className="text-[10px] uppercase font-extrabold text-white/80">NGO Quota</p>
-                <p className="font-display text-xl font-extrabold text-white">70% Reserved</p>
-              </div>
-              <div className="rounded-2xl bg-[#7C7D75] text-[#FCF8D8] p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <p className="text-[10px] uppercase font-extrabold text-[#D9DADF]">Audit Status</p>
-                <p className="font-display text-xl font-extrabold text-[#FCF8D8]">100% Sealed</p>
-              </div>
-              <div className="rounded-2xl bg-[#D9DADF] text-[#1C1D1A] p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <p className="text-[10px] uppercase font-extrabold text-[#7C7D75]">Response SLA</p>
-                <p className="font-display text-xl font-extrabold text-[#1C1D1A]">48h Max</p>
+              <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-[#1C1D1A] tracking-tight leading-tight">
+                Fair Allocation of Government College Infrastructure
+              </h1>
+              <p className="text-sm sm:text-base text-[#1C1D1A]/85 font-medium leading-relaxed max-w-2xl">
+                Discover and request access to vacant auditoriums, high-performance computing centers, and sports arenas. Tier 1 quota grants subsidized access to certified non-governmental community organizations.
+              </p>
+
+              {/* Quick Metrics Bento */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3">
+                <div className="rounded-2xl bg-[#FCF8D8] p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                  <p className="text-[10px] uppercase font-extrabold text-[#7C7D75]">Listed Assets</p>
+                  <p className="font-display text-xl font-extrabold text-[#1C1D1A]">{spaces.length} Spaces</p>
+                </div>
+                <div className="rounded-2xl bg-[#DD700B] text-white p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                  <p className="text-[10px] uppercase font-extrabold text-white/80">NGO Quota</p>
+                  <p className="font-display text-xl font-extrabold text-white">70% Reserved</p>
+                </div>
+                <div className="rounded-2xl bg-[#7C7D75] text-[#FCF8D8] p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                  <p className="text-[10px] uppercase font-extrabold text-[#D9DADF]">Audit Status</p>
+                  <p className="font-display text-xl font-extrabold text-[#FCF8D8]">100% Sealed</p>
+                </div>
+                <div className="rounded-2xl bg-[#D9DADF] text-[#1C1D1A] p-3.5 border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
+                  <p className="text-[10px] uppercase font-extrabold text-[#7C7D75]">Response SLA</p>
+                  <p className="font-display text-xl font-extrabold text-[#1C1D1A]">48h Max</p>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* Application Notification Banner */}
-        {recentBookingRef && (
+        {/* Application Notification Banner (Only for Requesters) */}
+        {!isDean && recentBookingRef && (
           <div className="rounded-2xl border-2 border-[#1C1D1A] bg-[#FCF8D8] p-4 text-[#1C1D1A] flex items-center justify-between shadow-[3px_3px_0px_0px_#1C1D1A]">
             <div className="flex items-center gap-3">
               <div className="h-8 w-8 rounded-xl bg-[#DD700B] text-white flex items-center justify-center font-bold border border-[#1C1D1A]">
@@ -316,7 +376,7 @@ export default function DiscoverSpacesPage() {
             <div>
               <span>
                 Displaying <strong className="text-[#1C1D1A]">{filteredSpaces.length}</strong> of{' '}
-                <strong className="text-[#1C1D1A]">{spaces.length}</strong> available facilities
+                <strong className="text-[#1C1D1A]">{spaces.length}</strong> {isDean ? 'managed facilities' : 'available facilities'}
               </span>
             </div>
           </div>
@@ -328,14 +388,17 @@ export default function DiscoverSpacesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredSpaces.map((space) => {
                 const requested =
-                  requestedSpaceIds.includes(space.id) || isSpaceRequested(space);
+                  !isDean &&
+                  (requestedSpaceIds.includes(space.id) || isSpaceRequested(space));
 
                 return (
                   <SpaceCard
                     key={space.id}
                     space={space}
+                    isDean={isDean}
                     isRequested={requested}
                     onRequestAccess={handleRequestClick}
+                    onRentOut={() => setIsListModalOpen(true)}
                   />
                 );
               })}
@@ -381,12 +444,19 @@ export default function DiscoverSpacesPage() {
         </div>
       </footer>
 
-      {/* Booking Modal */}
+      {/* Booking Modal (Only accessible to Requesters/NGOs) */}
       <BookingModal
         space={selectedSpace}
         isOpen={!!selectedSpace}
         onClose={() => setSelectedSpace(null)}
         onBookingSuccess={handleBookingSuccess}
+      />
+
+      {/* List Space Modal (Accessible to Deans to rent out facilities) */}
+      <ListSpaceModal
+        isOpen={isListModalOpen}
+        onClose={() => setIsListModalOpen(false)}
+        onSpaceListed={handleSpaceListed}
       />
     </div>
   );

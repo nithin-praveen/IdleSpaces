@@ -3,30 +3,26 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
+import { Navbar } from '@/components/Navbar';
 import {
-  ArrowRight,
-  ArrowUpRight,
   ShieldCheck,
   Building2,
   Users,
   Award,
-  Lock,
-  LogIn,
-  LogOut,
-  HelpCircle,
-  FileCheck,
-  Scale,
-  Sparkles,
   ChevronDown,
+  ArrowRight,
+  ArrowUpRight,
+  Sparkles,
+  HelpCircle,
+  Clock,
+  Landmark,
+  Scale,
 } from 'lucide-react';
 
 export default function AboutPage() {
-  const { user, logout } = useAuth();
-  const [openFaq, setOpenFaq] = React.useState<number | null>(null);
-
-  const toggleFaq = (idx: number) => {
-    setOpenFaq(openFaq === idx ? null : idx);
-  };
+  const { user } = useAuth();
+  const [openFaq, setOpenFaq] = React.useState<number | null>(0);
+  const isDean = user?.role === 'admin';
 
   const FAQS = [
     {
@@ -53,238 +49,104 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-[#FCF8D8] text-[#1C1D1A] font-body selection:bg-[#DD700B] selection:text-white flex flex-col justify-between">
-      {/* ── TOP HEADER ───────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-[#FCF8D8]/95 backdrop-blur-md border-b-2 border-[#1C1D1A] px-4 sm:px-6 lg:px-8 py-3.5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <span className="font-display font-extrabold text-2xl sm:text-3xl tracking-tight text-[#1C1D1A] group-hover:text-[#DD700B] transition-colors">
-              idlespaces.
-            </span>
-            <span className="h-2.5 w-2.5 rounded-full bg-[#DD700B] animate-pulse" />
-          </Link>
-
-          {/* Nav Links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-display font-bold text-[#1C1D1A]">
-            <Link href="/" className="hover:text-[#DD700B] transition-colors py-1">
-              Home
-            </Link>
-            <Link href="/discover" className="hover:text-[#DD700B] transition-colors py-1 flex items-center gap-1">
-              <span>Explore Spaces</span>
-              <ArrowUpRight className="h-3 w-3 text-[#DD700B]" />
-            </Link>
-            <Link href="/how-it-works" className="hover:text-[#DD700B] transition-colors py-1">
-              How It Works
-            </Link>
-            <Link href="/about" className="text-[#DD700B] py-1 border-b-2 border-[#DD700B]">
-              About
-            </Link>
-          </nav>
-
-          {/* User Auth CTAs */}
-          <div className="flex items-center gap-2">
-            {user ? (
-              <div className="flex items-center gap-2 bg-[#D9DADF] p-1 sm:px-3 sm:py-1 rounded-2xl border-2 border-[#1C1D1A]">
-                <div className="h-6 w-6 rounded-full bg-[#1C1D1A] text-[#FCF8D8] flex items-center justify-center font-bold text-[10px]">
-                  {user.role === 'admin' ? 'AD' : user.role === 'ngo' ? 'NG' : 'CP'}
-                </div>
-                <div className="hidden sm:block text-left leading-none">
-                  <span className="text-xs font-bold text-[#1C1D1A] block">{user.name.split(' ')[0]}</span>
-                  <span className="text-[9px] font-extrabold uppercase text-[#7C7D75]">{user.role}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => logout()}
-                  className="p-1 rounded-lg hover:bg-black/10 text-[#1C1D1A] transition-colors cursor-pointer"
-                  title="Sign Out"
-                >
-                  <LogOut className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <Link href="/user/login">
-                  <button
-                    type="button"
-                    className="bg-[#DD700B] hover:bg-[#c25e04] text-white font-display font-extrabold text-xs py-2 px-3.5 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A] flex items-center gap-1.5 cursor-pointer transition-all hover:-translate-y-0.5"
-                  >
-                    <LogIn className="h-3.5 w-3.5 text-white" />
-                    <span>USER LOGIN</span>
-                  </button>
-                </Link>
-                <Link href="/login" className="hidden sm:block">
-                  <button
-                    type="button"
-                    className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-2 px-3 rounded-2xl border-2 border-[#1C1D1A] shadow-[2px_2px_0px_0px_#7C7D75] flex items-center gap-1.5 cursor-pointer transition-all hover:-translate-y-0.5"
-                  >
-                    <Lock className="h-3 w-3 text-[#DD700B]" />
-                    <span>DEAN SSO</span>
-                  </button>
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* ── MAIN CONTENT ─────────────────────────────────────────────────── */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-16 flex-1">
-        {/* Page Hero */}
+        {/* Mission Statement */}
         <section className="space-y-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1C1D1A] text-[#FCF8D8] text-[11px] font-display font-extrabold uppercase tracking-wider">
-            <Scale className="h-3 w-3 text-[#DD700B]" />
-            <span>Public Asset Stewardship</span>
+            <HelpCircle className="h-3.5 w-3.5 text-[#DD700B]" />
+            <span>Public Education Asset Directive</span>
           </div>
           <h1 className="font-display font-extrabold text-4xl sm:text-5xl text-[#1C1D1A] tracking-tight leading-tight">
-            Democratizing Public Infrastructure for the Common Good
+            Built to Eliminate Wasted Academic Infrastructure
           </h1>
-          <p className="text-base sm:text-lg text-[#1C1D1A]/80 font-medium leading-relaxed">
-            IdleSpaces was created on a single, uncompromising premise: tax-funded educational laboratories, test benches, and halls should not sit locked behind bureaucratic red tape while grassroots creators and educators lack access.
+          <p className="text-base sm:text-lg text-[#1C1D1A]/85 font-medium leading-relaxed">
+            Government colleges and universities across the state house crores worth of cutting-edge hardware, auditoriums, and stadiums that remain dormant for more than 60% of the working year. We provide the statutory bridge connecting this idle wealth to researchers and civic creators.
           </p>
         </section>
 
-        {/* ── MISSION & STORY BENTO ────────────────────────────────────────── */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 p-8 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] space-y-4">
-            <span className="font-display font-extrabold text-xs text-[#DD700B] uppercase tracking-wider block">
-              The Origin Problem
-            </span>
-            <h2 className="font-display font-extrabold text-2xl text-[#1C1D1A] tracking-tight">
-              The \$4.2 Billion Underutilization Paradox
-            </h2>
-            <p className="text-xs sm:text-sm text-[#1C1D1A]/85 leading-relaxed font-medium">
-              Every day across the nation, state-of-the-art gene sequencing suites, 5-axis CNC mills, cleanrooms, and 1,000-seat auditoriums go completely dark at 5:00 PM and remain vacant throughout long semester recesses.
-            </p>
-            <p className="text-xs sm:text-sm text-[#1C1D1A]/85 leading-relaxed font-medium">
-              Simultaneously, grassroots non-profits running youth robotics bootcamps, community health workshops, and civic hackathons are locked out by prohibitive private venue rates and labyrinthine bureaucratic permissions. IdleSpaces removes this friction by establishing statutory public access rights.
-            </p>
-          </div>
-
-          <div className="p-8 rounded-3xl bg-[#FCF8D8] border-2 border-[#1C1D1A] shadow-[5px_5px_0px_0px_#1C1D1A] flex flex-col justify-between space-y-4">
-            <div className="space-y-2">
-              <span className="font-display font-extrabold text-xs text-[#1C1D1A] uppercase tracking-wider block">
-                Our Guarantee
-              </span>
-              <h3 className="font-display font-extrabold text-xl text-[#1C1D1A]">
-                Auditability Over Discretion
-              </h3>
-              <p className="text-xs text-[#7C7D75] font-semibold leading-relaxed">
-                By replacing subjective administrative gatekeeping with open immutable audit trails, every space request is adjudicable and permanently accountable.
-              </p>
-            </div>
-            <div className="p-3 bg-white rounded-2xl border-2 border-[#1C1D1A] text-center">
-              <span className="font-display font-extrabold text-2xl text-[#DD700B] block">100%</span>
-              <span className="text-[10px] font-bold text-[#1C1D1A] uppercase tracking-wider">
-                Cryptographically Sealed Logs
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* ── 4 CORE STATUTORY PILLARS ─────────────────────────────────────── */}
+        {/* ── CORE PILLARS BENTO ───────────────────────────────────────────── */}
         <section className="space-y-6">
           <div className="border-b-2 border-[#1C1D1A] pb-3">
-            <h2 className="font-display font-extrabold text-2xl text-[#1C1D1A] tracking-tight">
-              The IdleSpaces Operational Charter
+            <h2 className="font-display font-extrabold text-2xl text-[#1C1D1A]">
+              Our Guiding Principles
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="p-6 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-3">
-              <div className="h-10 w-10 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <Users className="h-5 w-5" />
+              <div className="h-10 w-10 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B]">
+                <Scale className="h-5 w-5" />
               </div>
-              <h3 className="font-display font-extrabold text-sm text-[#1C1D1A]">
-                70% Civic Quota
+              <h3 className="font-display font-extrabold text-xl text-[#1C1D1A]">
+                Civic Primacy
               </h3>
-              <p className="text-xs text-[#7C7D75] leading-relaxed font-semibold">
-                Guarantees that at least 70% of all off-peak equipment hours are reserved exclusively for non-profit and educational initiatives at ₹0 tariff.
+              <p className="text-xs text-[#1C1D1A]/80 font-medium leading-relaxed">
+                Public funds built these campuses. When academic classes conclude, priority must revert to public good, non-profit community welfare, and grassroots scientific advancement.
               </p>
             </div>
 
-            <div className="p-6 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-3">
-              <div className="h-10 w-10 rounded-2xl bg-[#D9DADF] border-2 border-[#1C1D1A] flex items-center justify-center text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <FileCheck className="h-5 w-5 text-[#DD700B]" />
-              </div>
-              <h3 className="font-display font-extrabold text-sm text-[#1C1D1A]">
-                Section 21 Mandate
-              </h3>
-              <p className="text-xs text-[#7C7D75] leading-relaxed font-semibold">
-                Precludes arbitrary verbal rejections. Every refusal must be formally gazette-justified and logged to the central administrative registry.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-3">
-              <div className="h-10 w-10 rounded-2xl bg-[#FCF8D8] border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B] shadow-[2px_2px_0px_0px_#1C1D1A]">
+            <div className="p-6 rounded-3xl bg-[#D9DADF] border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-3">
+              <div className="h-10 w-10 rounded-2xl bg-white border-2 border-[#1C1D1A] flex items-center justify-center text-[#7C7D75]">
                 <ShieldCheck className="h-5 w-5" />
               </div>
-              <h3 className="font-display font-extrabold text-sm text-[#1C1D1A]">
-                Condition Proof Escrow
+              <h3 className="font-display font-extrabold text-xl text-[#1C1D1A]">
+                Zero Discretionary Bias
               </h3>
-              <p className="text-xs text-[#7C7D75] leading-relaxed font-semibold">
-                Dual photographic verification at arrival and checkout eliminates post-event security deposit disputes and preserves expensive academic equipment.
+              <p className="text-xs text-[#1C1D1A]/80 font-medium leading-relaxed">
+                Rejections cannot be delivered informally or behind closed doors. Every adjudication is timestamped, sealed in public audit logs, and requires a documented statutory basis.
               </p>
             </div>
 
-            <div className="p-6 rounded-3xl bg-white border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-3">
-              <div className="h-10 w-10 rounded-2xl bg-[#D9DADF] border-2 border-[#1C1D1A] flex items-center justify-center text-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]">
-                <Lock className="h-5 w-5 text-[#DD700B]" />
+            <div className="p-6 rounded-3xl bg-[#FCF8D8] border-2 border-[#1C1D1A] shadow-[4px_4px_0px_0px_#1C1D1A] space-y-3">
+              <div className="h-10 w-10 rounded-2xl bg-white border-2 border-[#1C1D1A] flex items-center justify-center text-[#DD700B]">
+                <Award className="h-5 w-5" />
               </div>
-              <h3 className="font-display font-extrabold text-sm text-[#1C1D1A]">
-                ISO/IEC 27001 Sealed
+              <h3 className="font-display font-extrabold text-xl text-[#1C1D1A]">
+                Institutional Protection
               </h3>
-              <p className="text-xs text-[#7C7D75] leading-relaxed font-semibold">
-                All booking records, institutional approvals, and security audit hashes adhere to strict enterprise information security and data integrity standards.
+              <p className="text-xs text-[#1C1D1A]/80 font-medium leading-relaxed">
+                Colleges retain 100% calendar sovereignty. Automated security deposit escrows and mandatory check-in photo audits guarantee facilities are returned in flawless condition.
               </p>
             </div>
           </div>
         </section>
 
-        {/* ── FREQUENTLY ASKED QUESTIONS (FAQ) ─────────────────────────────── */}
+        {/* ── FREQUENTLY ASKED QUESTIONS ACCORDION ─────────────────────────── */}
         <section className="space-y-6">
-          <div className="border-b-2 border-[#1C1D1A] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <span className="font-display font-extrabold text-xs text-[#DD700B] uppercase tracking-wider block">
-                Frequently Asked Questions
-              </span>
-              <h2 className="font-display font-extrabold text-2xl text-[#1C1D1A] tracking-tight">
-                Clear Answers to Common Questions
-              </h2>
-            </div>
-            <span className="text-xs font-semibold text-[#7C7D75]">
-              Everything you need to know about the sharing network
-            </span>
+          <div className="border-b-2 border-[#1C1D1A] pb-3">
+            <h2 className="font-display font-extrabold text-2xl text-[#1C1D1A]">
+              Frequently Asked Questions & Statutory Clarifications
+            </h2>
           </div>
 
           <div className="space-y-3">
-            {FAQS.map((faq, idx) => {
-              const isOpen = openFaq === idx;
-              return (
-                <div
-                  key={idx}
-                  className="rounded-2xl border-2 border-[#1C1D1A] bg-white overflow-hidden shadow-[3px_3px_0px_0px_#1C1D1A] transition-all"
+            {FAQS.map((faq, idx) => (
+              <div
+                key={idx}
+                className="rounded-2xl border-2 border-[#1C1D1A] bg-white overflow-hidden shadow-[2px_2px_0px_0px_#1C1D1A]"
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                  className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 font-display font-extrabold text-sm sm:text-base text-[#1C1D1A] hover:bg-[#FCF8D8]/60 transition-colors cursor-pointer"
                 >
-                  <button
-                    type="button"
-                    onClick={() => toggleFaq(idx)}
-                    className="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer hover:bg-[#FCF8D8]/50 transition-colors"
-                  >
-                    <span className="font-display font-extrabold text-sm sm:text-base text-[#1C1D1A]">
-                      {faq.q}
-                    </span>
-                    <ChevronDown
-                      className={`h-4 w-4 text-[#DD700B] shrink-0 transition-transform duration-200 ${
-                        isOpen ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  {isOpen && (
-                    <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[#1C1D1A]/85 font-medium leading-relaxed border-t border-[#1C1D1A]/10 bg-[#FCF8D8]/20">
-                      {faq.a}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                  <span>{faq.q}</span>
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 transition-transform ${
+                      openFaq === idx ? 'rotate-180 text-[#DD700B]' : 'text-[#7C7D75]'
+                    }`}
+                  />
+                </button>
+                {openFaq === idx && (
+                  <div className="p-4 sm:p-5 pt-0 text-xs sm:text-sm text-[#1C1D1A]/85 font-medium leading-relaxed border-t border-[#1C1D1A]/10 bg-[#FCF8D8]/20">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </section>
 
@@ -333,6 +195,9 @@ export default function AboutPage() {
             <Link href="/" className="hover:text-[#DD700B] transition-colors">Home</Link>
             <Link href="/discover" className="hover:text-[#DD700B] transition-colors">Catalog</Link>
             <Link href="/how-it-works" className="hover:text-[#DD700B] transition-colors">How It Works</Link>
+            {isDean && (
+              <Link href="/admin" className="hover:text-[#DD700B] transition-colors">Dean Review</Link>
+            )}
             <Link href="/user/login" className="hover:text-[#DD700B] transition-colors">User Portal</Link>
           </div>
         </div>
