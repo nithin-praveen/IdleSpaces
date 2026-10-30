@@ -83,6 +83,8 @@ export default function DiscoverSpacesPage() {
 
   const [spaces, setSpaces] = React.useState<Space[]>(DEFAULT_SPACES);
   const [spaceImages, setSpaceImages] = React.useState<Record<string, string[]>>({});
+  const [listedSpaceIds, setListedSpaceIds] = React.useState<string[]>([]);
+  const [spaceToList, setSpaceToList] = React.useState<Space | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [selectedSpace, setSelectedSpace] = React.useState<Space | null>(null);
   const [isListModalOpen, setIsListModalOpen] = React.useState<boolean>(false);
@@ -172,6 +174,7 @@ export default function DiscoverSpacesPage() {
     location: string;
     imageUrls: string[];
   }) => {
+    setListedSpaceIds((prev) => [...new Set([...prev, newSpace.id, ...(spaceToList ? [spaceToList.id] : [])])]);
     setSpaceImages((prev) => ({ ...prev, [newSpace.id]: newSpace.imageUrls }));
     setSpaces((prev) => [
       {
@@ -400,10 +403,11 @@ export default function DiscoverSpacesPage() {
                     key={space.id}
                     space={space}
                     imageUrl={spaceImages[space.id]?.[0]}
+                    isRentedOut={listedSpaceIds.includes(space.id)}
                     isDean={isDean}
                     isRequested={requested}
                     onRequestAccess={handleRequestClick}
-                    onRentOut={() => setIsListModalOpen(true)}
+                    onRentOut={() => { setSpaceToList(space); setIsListModalOpen(true); }}
                   />
                 );
               })}

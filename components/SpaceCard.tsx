@@ -23,6 +23,7 @@ interface SpaceCardProps {
   isRequested?: boolean;
   isDean?: boolean;
   imageUrl?: string;
+  isRentedOut?: boolean;
 }
 
 export function SpaceCard({
@@ -34,6 +35,7 @@ export function SpaceCard({
   isRequested = false,
   isDean = false,
   imageUrl,
+  isRentedOut = false,
 }: SpaceCardProps) {
   const getTypeConfig = (type: SpaceType) => {
     switch (type) {
@@ -92,7 +94,9 @@ export function SpaceCard({
             </span>
           </div>
 
-          {isDean ? (
+          {isDean && isRentedOut ? (
+            <div className="flex items-center gap-1.5 rounded-full bg-[#D9DADF] px-2.5 py-1 text-[10px] font-extrabold text-[#1C1D1A] border border-[#1C1D1A]"><CheckCircle2 className="h-3 w-3 text-[#DD700B]" /><span>Facility Listed</span></div>
+          ) : isDean ? (
             <div className="flex items-center gap-1.5 rounded-full bg-[#FCF8D8] px-2.5 py-1 text-[10px] font-extrabold text-[#1C1D1A] border border-[#1C1D1A]">
               <span className="h-2 w-2 rounded-full bg-[#DD700B]" />
               <span>Available to Rent Out</span>
@@ -176,7 +180,9 @@ export function SpaceCard({
           )}
         </div>
 
-        {isDean ? (
+        {isDean && isRentedOut ? (
+          <span className="text-xs font-display font-extrabold text-[#7C7D75]">Currently Listed</span>
+        ) : isDean ? (
           /* Dean: Service Provider Mode (Cannot request access, can rent out) */
           <button
             type="button"

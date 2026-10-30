@@ -17,6 +17,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useAuth } from '@/components/AuthProvider';
 
 interface UserBooking {
   id: string;
@@ -78,6 +79,8 @@ const INITIAL_USER_BOOKINGS: UserBooking[] = [
 ];
 
 export default function MyBookingsPage() {
+  const { user } = useAuth();
+  const isDean = user?.role === 'admin';
   const [bookings, setBookings] = React.useState<UserBooking[]>(INITIAL_USER_BOOKINGS);
 
   const [modalConfig, setModalConfig] = React.useState<{
@@ -312,6 +315,12 @@ export default function MyBookingsPage() {
 
                   {/* Actions */}
                   <div className="p-4 pt-3 border-t-2 border-[#1C1D1A] bg-[#FCF8D8]/70 flex flex-wrap items-center justify-between gap-2">
+                    {isDean ? (
+                      <>
+                        <p className="text-xs font-semibold text-[#7C7D75]">Facility activity and booking history</p>
+                        {hasCheckIn && hasCheckOut && <button type="button" onClick={() => setComparisonBooking(booking)} className="w-full bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-xs py-2.5 px-4 rounded-2xl border-2 border-[#1C1D1A] flex items-center justify-center gap-2 cursor-pointer"><Eye className="h-4 w-4 text-[#DD700B]" /><span>View Inspection Proof (Before vs. After)</span></button>}
+                      </>
+                    ) : <>
                     {!hasCheckIn && (
                       <button
                         type="button"
@@ -344,6 +353,7 @@ export default function MyBookingsPage() {
                         <span>View Inspection Proof (Before vs. After)</span>
                       </button>
                     )}
+                    </>}
                   </div>
                 </div>
               );
