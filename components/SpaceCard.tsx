@@ -22,6 +22,7 @@ interface SpaceCardProps {
   amenities?: string[];
   isRequested?: boolean;
   isDean?: boolean;
+  imageUrl?: string;
 }
 
 export function SpaceCard({
@@ -32,6 +33,7 @@ export function SpaceCard({
   amenities,
   isRequested = false,
   isDean = false,
+  imageUrl,
 }: SpaceCardProps) {
   const getTypeConfig = (type: SpaceType) => {
     switch (type) {
@@ -78,6 +80,7 @@ export function SpaceCard({
   return (
     <div className="group relative flex flex-col justify-between overflow-hidden bg-white border-2 border-[#1C1D1A] rounded-3xl shadow-[4px_4px_0px_0px_#1C1D1A] hover:shadow-[6px_6px_0px_0px_#DD700B] transition-all hover:-translate-y-1">
       {/* Header Info */}
+      {imageUrl && <img src={imageUrl} alt={`${space.name} facility`} className="h-44 w-full object-cover border-b-2 border-[#1C1D1A]" />}
       <div className="p-5 pb-3 space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">

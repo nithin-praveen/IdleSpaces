@@ -82,6 +82,7 @@ export default function DiscoverSpacesPage() {
   const isDean = user?.role === 'admin';
 
   const [spaces, setSpaces] = React.useState<Space[]>(DEFAULT_SPACES);
+  const [spaceImages, setSpaceImages] = React.useState<Record<string, string[]>>({});
   const [loading, setLoading] = React.useState<boolean>(true);
   const [selectedSpace, setSelectedSpace] = React.useState<Space | null>(null);
   const [isListModalOpen, setIsListModalOpen] = React.useState<boolean>(false);
@@ -169,7 +170,9 @@ export default function DiscoverSpacesPage() {
     type: 'auditorium' | 'computer_lab' | 'ground';
     capacity: number;
     location: string;
+    imageUrls: string[];
   }) => {
+    setSpaceImages((prev) => ({ ...prev, [newSpace.id]: newSpace.imageUrls }));
     setSpaces((prev) => [
       {
         id: newSpace.id,
@@ -396,6 +399,7 @@ export default function DiscoverSpacesPage() {
                   <SpaceCard
                     key={space.id}
                     space={space}
+                    imageUrl={spaceImages[space.id]?.[0]}
                     isDean={isDean}
                     isRequested={requested}
                     onRequestAccess={handleRequestClick}

@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   ShieldCheck,
   Lock,
+  ImagePlus,
+  X,
 } from 'lucide-react';
 import { useAuth } from '@/components/AuthProvider';
 
@@ -22,6 +24,7 @@ interface ListSpaceModalProps {
     type: 'auditorium' | 'computer_lab' | 'ground';
     capacity: number;
     location: string;
+    imageUrls: string[];
   }) => void;
 }
 
@@ -36,6 +39,7 @@ export function ListSpaceModal({
   const [capacity, setCapacity] = React.useState(350);
   const [location, setLocation] = React.useState('Academic Quad, Block B');
   const [amenities, setAmenities] = React.useState('Dual 4K Projectors, Central AC, Surround PA, Green Room');
+  const [images, setImages] = React.useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
 
@@ -45,6 +49,7 @@ export function ListSpaceModal({
       setType('auditorium');
       setCapacity(350);
       setLocation('Academic Quad, Block B');
+      setImages([]);
       setIsSuccess(false);
       setIsSubmitting(false);
     }
@@ -69,6 +74,7 @@ export function ListSpaceModal({
         type,
         capacity: Number(capacity) || 100,
         location,
+        imageUrls: images,
       });
     }, 600);
   };
@@ -214,6 +220,27 @@ export function ListSpaceModal({
                   placeholder="e.g. Dual 4K Projectors, Central AC, Surround PA, Green Room"
                   className="w-full px-3.5 py-2.5 rounded-2xl bg-[#FCF8D8]/50 border-2 border-[#1C1D1A] text-xs font-semibold text-[#1C1D1A] focus:outline-hidden focus:border-[#DD700B]"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="facility-photos" className="font-display font-extrabold text-[#1C1D1A] block">Facility Photos</label>
+                <label htmlFor="facility-photos" className="flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#1C1D1A] bg-[#FCF8D8]/50 px-4 py-4 text-xs font-bold text-[#1C1D1A] cursor-pointer hover:border-[#DD700B]">
+                  <ImagePlus className="h-4 w-4 text-[#DD700B]" /> Add photos (up to 5, 5 MB each)
+                </label>
+                <input id="facility-photos" type="file" accept="image/*" multiple className="sr-only" onChange={(event) => {
+                  const selected = Array.from(event.target.files ?? []).slice(0, 5);
+                  if (selected.some((file) => file.size > 5 * 1024 * 1024)) {
+                    event.target.value = '';
+                    return;
+                  }
+                  Promise.all(selected.map((file) => new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(String(reader.result));
+                    reader.onerror = () => reject(reader.error);
+                    reader.readAsDataURL(file);
+                  }))).then(setImages).catch(() => setImages([]));
+                }} />
+                {images.length > 0 && <div className="grid grid-cols-3 gap-2">{images.map((src, index) => <div key={src} className="relative aspect-video overflow-hidden rounded-xl border border-[#1C1D1A]"><img src={src} alt={`Facility preview ${index + 1}`} className="h-full w-full object-cover" /><button type="button" aria-label={`Remove photo ${index + 1}`} onClick={() => setImages((current) => current.filter((_, i) => i !== index))} className="absolute right-1 top-1 rounded-full bg-white p-1 text-[#1C1D1A]"><X className="h-3 w-3" /></button></div>)}</div>}
               </div>
 
               <div className="p-3.5 rounded-2xl bg-[#D9DADF] border-2 border-[#1C1D1A] flex items-center gap-2.5">
