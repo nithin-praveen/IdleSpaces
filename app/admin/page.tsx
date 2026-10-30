@@ -43,6 +43,8 @@ import { format } from 'date-fns';
 
 interface DemoBooking {
   id: string;
+  requesterName: string;
+  requesterJobTitle: string;
   applicantName: string;
   applicantRole: 'ngo' | 'corporate';
   tier: 1 | 2;
@@ -61,6 +63,8 @@ interface DemoBooking {
 const INITIAL_BOOKINGS: DemoBooking[] = [
   {
     id: 'b1111111-2222-3333-4444-555555555001',
+    requesterName: 'Ananya Deshmukh',
+    requesterJobTitle: 'Secretary',
     applicantName: 'Pratham Youth Education Initiative',
     applicantRole: 'ngo',
     tier: 1,
@@ -75,6 +79,8 @@ const INITIAL_BOOKINGS: DemoBooking[] = [
   },
   {
     id: 'b1111111-2222-3333-4444-555555555002',
+    requesterName: 'Rural Digital Empowerment Foundation Representative',
+    requesterJobTitle: 'Nodal Officer',
     applicantName: 'Rural Digital Empowerment Foundation',
     applicantRole: 'ngo',
     tier: 1,
@@ -89,6 +95,8 @@ const INITIAL_BOOKINGS: DemoBooking[] = [
   },
   {
     id: 'b1111111-2222-3333-4444-555555555003',
+    requesterName: 'Vikramaditya Roy',
+    requesterJobTitle: 'CSR Director',
     applicantName: 'Apex Infotech Solutions (CSR Division)',
     applicantRole: 'corporate',
     tier: 2,
@@ -103,6 +111,8 @@ const INITIAL_BOOKINGS: DemoBooking[] = [
   },
   {
     id: 'b1111111-2222-3333-4444-555555555004',
+    requesterName: 'Community Health Awareness Society Representative',
+    requesterJobTitle: 'Authorized Representative',
     applicantName: 'Community Health Awareness Society',
     applicantRole: 'ngo',
     tier: 1,
@@ -506,6 +516,7 @@ export default function AdminPage() {
                         </p>
                         <p className="text-sm font-display font-extrabold text-[#1C1D1A] mt-0.5">{booking.applicantName}</p>
                         <p className="text-[11px] text-[#7C7D75] font-semibold mt-0.5">Verified Society / Registration 80G</p>
+                        <p className="text-[11px] text-[#1C1D1A] font-semibold mt-1">Requested by {booking.requesterName} · {booking.requesterJobTitle}</p>
                       </div>
 
                       <div>
