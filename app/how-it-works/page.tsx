@@ -280,14 +280,29 @@ export default function HowItWorksPage() {
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsListModalOpen(true)}
-            className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-3 px-6 rounded-2xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#DD700B] flex items-center gap-2 transition-all hover:-translate-y-0.5 cursor-pointer shrink-0"
-          >
-            <Plus className="h-4 w-4 text-[#DD700B]" />
-            <span>List Institutional Facility</span>
-          </button>
+          {user?.role === 'admin' ? (
+            <button
+              type="button"
+              onClick={() => setIsListModalOpen(true)}
+              className="bg-[#1C1D1A] hover:bg-black text-[#FCF8D8] font-display font-extrabold text-xs py-3 px-6 rounded-2xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#DD700B] flex items-center gap-2 transition-all hover:-translate-y-0.5 cursor-pointer shrink-0"
+            >
+              <Plus className="h-4 w-4 text-[#DD700B]" />
+              <span>List Institutional Facility</span>
+              <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-[#DD700B] text-white">
+                Dean
+              </span>
+            </button>
+          ) : (
+            <Link href="/login?redirect=/how-it-works">
+              <button
+                type="button"
+                className="bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-xs py-3 px-6 rounded-2xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] flex items-center gap-2 transition-all hover:-translate-y-0.5 cursor-pointer shrink-0"
+              >
+                <Lock className="h-4 w-4 text-[#DD700B]" />
+                <span>Dean Sign In to List</span>
+              </button>
+            </Link>
+          )}
         </section>
       </main>
 

@@ -230,14 +230,20 @@ export default function CalmIdleSpacesHome() {
                 </button>
               </Link>
 
-              <button
-                type="button"
-                onClick={() => setIsListModalOpen(true)}
-                className="bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-sm py-3 px-5 rounded-2xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] flex items-center gap-2 transition-all hover:-translate-y-0.5 cursor-pointer"
-              >
-                <span>List Idle Facility</span>
-                <Plus className="h-4 w-4 text-[#DD700B]" />
-              </button>
+              {/* List Idle Facility: Appears ONLY when Dean is authenticated */}
+              {user?.role === 'admin' && (
+                <button
+                  type="button"
+                  onClick={() => setIsListModalOpen(true)}
+                  className="bg-white hover:bg-[#D9DADF] text-[#1C1D1A] font-display font-extrabold text-sm py-3 px-5 rounded-2xl border-2 border-[#1C1D1A] shadow-[3px_3px_0px_0px_#1C1D1A] flex items-center gap-2 transition-all hover:-translate-y-0.5 cursor-pointer animate-in fade-in"
+                >
+                  <Plus className="h-4 w-4 text-[#DD700B]" />
+                  <span>List Idle Facility</span>
+                  <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-[#1C1D1A] text-[#FCF8D8]">
+                    Dean
+                  </span>
+                </button>
+              )}
             </div>
 
             {/* Calm Trust Metrics */}
