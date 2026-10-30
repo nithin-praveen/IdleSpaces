@@ -50,8 +50,8 @@ export function Navbar() {
       name: 'Dean Review',
       href: '/admin',
       icon: ShieldCheck,
-      activeColor: 'bg-[#1C1D1A] text-[#FCF8D8]',
-      requiresAdmin: false,
+      activeColor: 'bg-[#7C7D75] text-[#FCF8D8]',
+      requiresAdmin: true,
     },
     {
       name: 'Check-In Proof',

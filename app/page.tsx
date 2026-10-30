@@ -735,7 +735,6 @@ export default function CalmIdleSpacesHome() {
 
           <div className="flex items-center gap-4 text-[#1C1D1A]">
             <Link href="/discover" className="hover:text-[#DD700B] transition-colors">Catalog</Link>
-            <Link href="/admin" className="hover:text-[#DD700B] transition-colors">Dean Review</Link>
             <Link href="/how-it-works" className="hover:text-[#DD700B] transition-colors">How It Works</Link>
             <Link href="/about" className="hover:text-[#DD700B] transition-colors">About</Link>
             {user?.role === 'admin' && (

@@ -324,7 +324,11 @@ export function decodeSession(token: string): SessionPayload | null {
   try {
     const raw = Buffer.from(token, 'base64').toString('utf-8');
     const payload = JSON.parse(raw) as SessionPayload;
-    if (payload.expiresAt && payload.expiresAt < Date.now()) {
+    const user = payload?.user;
+    const validUser = user && typeof user.id === 'string' && typeof user.email === 'string' &&
+      typeof user.name === 'string' && ['admin', 'ngo', 'corporate', 'community'].includes(user.role);
+    if (!validUser || typeof payload.issuedAt !== 'number' || typeof payload.expiresAt !== 'number' ||
+        payload.issuedAt > Date.now() || payload.expiresAt <= Date.now()) {
       return null; // Expired
     }
     return payload;
