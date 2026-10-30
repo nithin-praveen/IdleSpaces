@@ -60,9 +60,9 @@ export function proxy(request: NextRequest) {
     const redirectParam = request.nextUrl.searchParams.get('redirect');
     // Accept only local absolute paths and avoid sending authenticated users
     // back to a login route (which would form a redirect loop).
-    const safeRedirect = redirectParam?.startsWith('/') && !redirectParam.startsWith('//') &&
+    const safeRedirect = !!redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//') &&
       !redirectParam.startsWith('/login') && !redirectParam.startsWith('/user/login');
-    const destination = safeRedirect ? redirectParam : (user.role === 'admin' ? '/admin' : '/discover');
+    const destination = safeRedirect && redirectParam ? redirectParam : (user.role === 'admin' ? '/admin' : '/discover');
     return NextResponse.redirect(new URL(destination, request.url));
   }
 
