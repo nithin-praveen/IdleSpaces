@@ -163,12 +163,12 @@ export function SpaceCard({
           {isDean ? (
             <>
               <span className="text-[10px] uppercase font-extrabold text-[#7C7D75] block">Provider Quota</span>
-              <span className="text-[#1C1D1A] font-bold text-[10px]">Open for Public Lease</span>
+              <span className="text-[#1C1D1A] font-bold text-xs">Public Asset</span>
             </>
           ) : (
             <>
-              <span className="text-[10px] uppercase font-extrabold text-[#DD700B] block">Tier 1 Quota</span>
-              <span className="text-[#7C7D75] font-semibold text-[10px]">₹0 Tariff for NGOs</span>
+              <span className="text-[10px] uppercase font-extrabold text-[#DD700B] block">Tier 1 NGO / Societal</span>
+              <span className="text-[#7C7D75] font-semibold text-[10px]">₹0 Tariff for NGOs & Societal</span>
             </>
           )}
         </div>

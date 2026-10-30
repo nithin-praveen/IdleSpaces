@@ -103,7 +103,7 @@ export function BookingModal({
     }
 
     if (!selectedFile && !mockFileUploaded) {
-      setErrorMessage('A valid NGO Registration Certificate or Corporate NOC is statutory required.');
+      setErrorMessage('A valid NGO / Societal Registration Certificate or Private NOC is statutory required.');
       return;
     }
 
@@ -256,7 +256,7 @@ export function BookingModal({
               <div className="flex justify-between items-center">
                 <span className="text-[#7C7D75] uppercase text-[10px]">Statutory Priority:</span>
                 <span className="px-2.5 py-0.5 rounded-md text-[10px] font-display font-extrabold bg-[#DD700B] text-white border border-[#1C1D1A]">
-                  {orgType === 'ngo' ? 'Tier 1 • NGO Priority (Free Access)' : 'Tier 2 • Corporate Reservation'}
+                  {orgType === 'ngo' ? 'Tier 1 • NGO / Societal Priority (Free Access)' : 'Tier 2 • Private Reservation'}
                 </span>
               </div>
             </div>
@@ -381,7 +381,7 @@ export function BookingModal({
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-display font-extrabold text-[#1C1D1A]">Tier 1: Registered NGO</span>
+                      <span className="text-xs font-display font-extrabold text-[#1C1D1A]">Tier 1: NGO / Societal</span>
                       <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#DD700B] text-white border border-[#1C1D1A]">
                         70% Quota
                       </span>
@@ -401,13 +401,13 @@ export function BookingModal({
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-display font-extrabold text-[#1C1D1A]">Tier 2: Corporate / Commercial</span>
+                      <span className="text-xs font-display font-extrabold text-[#1C1D1A]">Tier 2: Private</span>
                       <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#7C7D75] text-white border border-[#1C1D1A]">
-                        Commercial
+                        Private
                       </span>
                     </div>
                     <p className="text-[11px] text-[#7C7D75] font-medium mt-1">
-                      CSR summits, industry training, licensed corporate gatherings.
+                      Private organizations, industry training, licensed commercial gatherings.
                     </p>
                   </button>
                 </div>

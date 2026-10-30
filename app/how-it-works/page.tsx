@@ -76,7 +76,7 @@ export default function HowItWorksPage() {
 
               <div className="p-3.5 rounded-2xl bg-[#FCF8D8] border border-[#1C1D1A] text-[11px] font-semibold text-[#1C1D1A] space-y-1">
                 <span className="font-display font-extrabold text-[10px] uppercase text-[#DD700B] block">Statutory Rule:</span>
-                <p>70% of vacant capacity is ring-fenced for registered non-profits under State Resolution 41-B.</p>
+                <p>70% of vacant capacity is ring-fenced for registered non-profits & societal bodies under State Resolution 41-B.</p>
               </div>
             </div>
 

@@ -216,7 +216,7 @@ export default function CalmIdleSpacesHome() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-24 flex-1">
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           {/* Left Column: Clean Editorial Typography & CTAs */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-7 space-y-6">
             <h1 className="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-[#1C1D1A] tracking-tight leading-[1.05]">
               Unlock <br className="hidden sm:inline" />
               underused spaces <br className="hidden sm:inline" />
@@ -269,7 +269,7 @@ export default function CalmIdleSpacesHome() {
               </div>
               <div>
                 <span className="font-display font-extrabold text-xl sm:text-2xl text-[#DD700B] block">₹0 Tariff</span>
-                <span className="text-[11px] text-[#7C7D75] font-semibold">Tier 1 NGO Waiver</span>
+                <span className="text-[11px] text-[#7C7D75] font-semibold">Tier 1 NGO / Societal Waiver</span>
               </div>
               <div>
                 <span className="font-display font-extrabold text-xl sm:text-2xl text-[#1C1D1A] block">48 Hours</span>
@@ -279,11 +279,11 @@ export default function CalmIdleSpacesHome() {
           </div>
 
           {/* Right Column: Clean doodle placed directly on page (Prominent & Generous Scale) */}
-          <div className="lg:col-span-6 flex items-center justify-center lg:justify-end">
+          <div className="lg:col-span-5 flex items-center justify-center lg:justify-end">
             <img
               src="/hero-doodle-clean.png"
               alt="Institutional Space and Equipment Sharing Network"
-              className="w-full max-w-2xl lg:max-w-none lg:scale-115 h-auto object-contain select-none pointer-events-none transform transition-transform"
+              className="w-full max-w-lg lg:max-w-none h-auto object-contain select-none pointer-events-none"
             />
           </div>
         </section>

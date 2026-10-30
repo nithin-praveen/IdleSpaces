@@ -75,7 +75,8 @@ function LoginForm() {
       const result = await login(email, password);
 
       if (result.success) {
-        router.push(redirectTarget);
+        const dest = searchParams.get('redirect') || '/admin';
+        window.location.href = dest;
       } else {
         setErrorMessage(result.error || 'Authentication failed. Please verify your credentials.');
         if (result.remainingSeconds && result.remainingSeconds > 0) {
@@ -89,10 +90,23 @@ function LoginForm() {
     }
   };
 
-  const handleQuickFill = (acc: typeof DEMO_ACCOUNTS[0]) => {
+  const handleQuickFill = async (acc: typeof DEMO_ACCOUNTS[0]) => {
     setEmail(acc.email);
     setPassword(acc.plainDemoPassword);
     setErrorMessage(null);
+    setIsSubmitting(true);
+    try {
+      const res = await login(acc.email, acc.plainDemoPassword);
+      if (res.success) {
+        const dest = acc.role === 'admin' ? '/admin' : '/discover';
+        window.location.href = dest;
+        return;
+      }
+    } catch {
+      // fallback
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

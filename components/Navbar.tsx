@@ -90,11 +90,10 @@ export function Navbar() {
               return (
                 <Link key={link.href} href={link.href}>
                   <div
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-xs font-display font-bold border-2 transition-all cursor-pointer ${
-                      isActive
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-xs font-display font-bold border-2 transition-all cursor-pointer ${isActive
                         ? `${link.activeColor} border-[#1C1D1A] shadow-[2px_2px_0px_0px_#1C1D1A]`
                         : 'bg-transparent text-[#1C1D1A] border-transparent hover:border-[#1C1D1A] hover:bg-[#D9DADF]'
-                    }`}
+                      }`}
                   >
                     <Icon className="h-3.5 w-3.5 shrink-0" />
                     <span>{link.name}</span>
@@ -158,13 +157,12 @@ export function Navbar() {
                             switchDemoRole('ngo');
                             setRoleMenuOpen(false);
                           }}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center justify-between ${
-                            user.role === 'ngo'
+                          className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center justify-between ${user.role === 'ngo'
                               ? 'bg-[#DD700B] text-white'
                               : 'hover:bg-black/10 text-[#1C1D1A]'
-                          }`}
+                            }`}
                         >
-                          <span>NGO / Normal User (Requester)</span>
+                          <span>Tier 1 NGO Officer</span>
                           {user.role === 'ngo' && <span className="text-[10px]">Active</span>}
                         </button>
 
@@ -174,14 +172,13 @@ export function Navbar() {
                             switchDemoRole('admin');
                             setRoleMenuOpen(false);
                           }}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center justify-between mt-0.5 ${
-                            user.role === 'admin'
+                          className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center justify-between mt-0.5 ${user.role === 'admin'
                               ? 'bg-[#7C7D75] text-[#FCF8D8]'
                               : 'hover:bg-black/10 text-[#1C1D1A]'
-                          }`}
+                            }`}
                         >
-                          <span>College Dean (Provider)</span>
-                          {user.role === 'admin' && <span className="text-[10px]">Active</span>}
+                          <span>Tier 2 Corporate CSR</span>
+                          {user.role === 'corporate' && <span className="text-[10px]">Active</span>}
                         </button>
                       </div>
 

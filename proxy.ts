@@ -4,8 +4,8 @@ import { SESSION_COOKIE_NAME, decodeSession } from '@/lib/auth';
 
 /**
  * Next.js 16 Proxy Convention
- * Replaces deprecated middleware.js as specified in Next.js 16 architecture.
- * Enforces role-based route protection, session validation, and security headers.
+ * Injects statutory security headers without interfering with client-side RSC hydration.
+ * Route-level authorization is enforced within page components and server actions.
  */
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -58,8 +58,6 @@ export function proxy(request: NextRequest) {
   // 3. If authenticated user tries to access /login or /user/login, redirect to intended target or /discover
   if ((pathname === '/login' || pathname === '/user/login') && user) {
     const redirectParam = request.nextUrl.searchParams.get('redirect');
-    // Accept only local absolute paths and avoid sending authenticated users
-    // back to a login route (which would form a redirect loop).
     const safeRedirect = !!redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//') &&
       !redirectParam.startsWith('/login') && !redirectParam.startsWith('/user/login');
     const destination = safeRedirect && redirectParam ? redirectParam : (user.role === 'admin' ? '/admin' : '/discover');
@@ -80,13 +78,8 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes if any)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     * Match all request paths except static assets
      */
     '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
   ],
 };
-

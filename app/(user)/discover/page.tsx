@@ -205,6 +205,7 @@ export default function DiscoverSpacesPage() {
               </p>
             </div>
 
+
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full md:w-auto">
               <button
                 type="button"
@@ -227,7 +228,7 @@ export default function DiscoverSpacesPage() {
                 Fair Allocation of Government College Infrastructure
               </h1>
               <p className="text-sm sm:text-base text-[#1C1D1A]/85 font-medium leading-relaxed max-w-2xl">
-                Discover and request access to vacant auditoriums, high-performance computing centers, and sports arenas. Tier 1 quota grants subsidized access to certified non-governmental community organizations.
+                Discover and request access to vacant auditoriums, high-performance computing centers, and sports arenas. Tier 1 quota grants subsidized access to certified non-governmental & societal community organizations.
               </p>
 
               {/* Quick Metrics Bento */}

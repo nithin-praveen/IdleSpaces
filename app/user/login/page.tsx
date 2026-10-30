@@ -135,7 +135,7 @@ function UserLoginForm() {
         <div className="grid grid-cols-2 text-xs font-display font-extrabold border-b-2 border-[#1C1D1A]">
           <div className="flex items-center justify-center gap-1.5 py-3 px-3 bg-[#1C1D1A] text-[#FCF8D8] text-center border-r-2 border-[#1C1D1A]">
             <Users className="h-3.5 w-3.5 text-[#DD700B]" />
-            <span>👥 User & NGO Portal</span>
+            <span>👥 NGO/Societal & Private Portal</span>
           </div>
           <Link
             href="/login"
@@ -156,7 +156,7 @@ function UserLoginForm() {
               User & Community Portal
             </h1>
             <p className="text-xs text-[#7C7D75] mt-0.5 font-semibold">
-              Fair space reservation for verified NGOs & corporates
+              Fair space reservation for verified NGOs/societal groups & private entities
             </p>
           </div>
           <div className="h-11 w-11 rounded-2xl bg-[#DD700B] border-2 border-[#1C1D1A] flex items-center justify-center text-white shrink-0 shadow-[2px_2px_0px_0px_#1C1D1A]">
@@ -321,7 +321,7 @@ function UserLoginForm() {
                   >
                     <div className="flex items-center gap-1.5 text-xs font-display font-extrabold text-[#1C1D1A]">
                       <HeartHandshake className="h-4 w-4 text-[#DD700B]" />
-                      <span>Tier 1: NGO / Trust</span>
+                      <span>Tier 1: NGO / Societal</span>
                     </div>
                     <p className="text-[10px] text-[#7C7D75] mt-1 font-semibold leading-tight">
                       70% Quota • Subsidized Access
@@ -339,10 +339,10 @@ function UserLoginForm() {
                   >
                     <div className="flex items-center gap-1.5 text-xs font-display font-extrabold text-[#1C1D1A]">
                       <Building2 className="h-4 w-4 text-[#7C7D75]" />
-                      <span>Tier 2: Corporate</span>
+                      <span>Tier 2: Private</span>
                     </div>
                     <p className="text-[10px] text-[#7C7D75] mt-1 font-semibold leading-tight">
-                      Standard Commercial Quota
+                      Standard Private / Commercial Quota
                     </p>
                   </button>
                 </div>
@@ -471,7 +471,7 @@ function UserLoginForm() {
                         {acc.name.split(' (')[0]}
                       </span>
                       <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-[#1C1D1A] text-[#FCF8D8] border border-[#1C1D1A]">
-                        {acc.role.toUpperCase()} • TIER {acc.tier}
+                        {acc.role === 'corporate' ? 'PRIVATE' : 'NGO/SOCIETAL'} • TIER {acc.tier}
                       </span>
                     </div>
                     <p className="text-[11px] text-[#7C7D75] font-mono mt-0.5">

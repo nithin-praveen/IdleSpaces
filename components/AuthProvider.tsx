@@ -15,8 +15,8 @@ import {
 interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; remainingSeconds?: number }>;
-  register: (input: RegisterUserInput) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; remainingSeconds?: number; user?: AuthUser }>;
+  register: (input: RegisterUserInput) => Promise<{ success: boolean; error?: string; user?: AuthUser }>;
   logout: () => Promise<void>;
   switchDemoRole: (role: 'admin' | 'ngo' | 'corporate') => Promise<void>;
 }
@@ -61,8 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const res = await loginAction(email, password);
         if (res.success) {
           setUser(res.user);
-          router.refresh();
-          return { success: true };
+          return { success: true, user: res.user };
         } else {
           return {
             success: false,
@@ -77,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
       }
     },
-    [router]
+    []
   );
 
   // Register handler
@@ -87,8 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const res = await registerUserAction(input);
         if (res.success) {
           setUser(res.user);
-          router.refresh();
-          return { success: true };
+          return { success: true, user: res.user };
         } else {
           return {
             success: false,
@@ -102,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
       }
     },
-    [router]
+    []
   );
 
   // Logout handler
@@ -110,14 +108,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await logoutAction();
       setUser(null);
-      router.push('/login');
-      router.refresh();
+      window.location.href = '/login';
     } catch (err) {
       console.error('[AuthProvider] Logout error:', err);
       setUser(null);
-      router.push('/login');
+      window.location.href = '/login';
     }
-  }, [router]);
+  }, []);
 
   // Demo role switcher for testing convenience
   const switchDemoRole = React.useCallback(
@@ -127,10 +124,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await loginAction(demoAccount.email, demoAccount.plainDemoPassword);
         const updated = await getCurrentUserAction();
         setUser(updated);
-        router.refresh();
+        if (role === 'admin') {
+          window.location.href = '/admin';
+        } else {
+          window.location.href = '/discover';
+        }
       }
     },
-    [router]
+    []
   );
 
   return (
@@ -156,4 +157,3 @@ export function useAuth() {
   }
   return context;
 }
-

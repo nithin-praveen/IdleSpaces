@@ -176,7 +176,7 @@ export default function MyBookingsPage() {
                 <p className="font-display font-extrabold text-xs text-[#1C1D1A]">Pratham Youth Initiative</p>
                 <div className="flex items-center gap-1 text-[10px] text-[#7C7D75] font-extrabold">
                   <ShieldCheck className="h-3 w-3 text-[#DD700B]" />
-                  <span>Tier 1 Verified NGO • 70% Quota Beneficiary</span>
+                  <span>Tier 1 Verified NGO / Societal • 70% Quota Beneficiary</span>
                 </div>
               </div>
             </div>
