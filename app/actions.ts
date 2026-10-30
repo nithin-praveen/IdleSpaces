@@ -2,6 +2,7 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { getCurrentUserAction } from '@/app/auth-actions';
 import type { Database } from '@/types/database';
 import type {
   Space,
@@ -63,8 +64,9 @@ function statusToAuditAction(status: BookingStatus): string {
     rejected: 'REJECTED',
     waitlisted: 'WAITLISTED',
     completed: 'COMPLETED',
+    cancelled: 'CANCELLED',
   };
-  return map[status];
+  return map[status] || 'STATUS_UPDATE';
 }
 
 // ==============================================================================
@@ -84,22 +86,22 @@ export async function getSpaces(): Promise<ActionResult<Space[]>> {
 
     if (error) {
       console.error('[getSpaces] Supabase error:', error.message);
-      return { success: false, error: error.message };
+      return { success: false, error: 'Failed to retrieve available facilities.' };
     }
 
     return { success: true, data: data ?? [] };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error fetching spaces.';
     console.error('[getSpaces] Unexpected error:', message);
-    return { success: false, error: message };
+    return { success: false, error: 'An unexpected system error occurred.' };
   }
 }
 
 // ==============================================================================
 // 2. createBookingRequest()
 //    Inserts a booking with status = 'pending' AND simultaneously writes an
-//    audit_log entry with action = 'REQUESTED'. Both must succeed — a partial
-//    failure is surfaced clearly so admins can investigate.
+//    audit_log entry with action = 'REQUESTED'. Both must succeed.
+//    SECURITY: Enforces session-derived identity to prevent IDOR attacks.
 // ==============================================================================
 
 export async function createBookingRequest(
@@ -109,16 +111,28 @@ export async function createBookingRequest(
   endDate: string,          // YYYY-MM-DD
   docUrl: string | null = null
 ): Promise<ActionResult<{ booking: Booking; auditLog: AuditLog }>> {
-  // --- Input validation ---
-  if (!spaceId || !userId || !startDate || !endDate) {
+  // Session authentication check (Defense against IDOR)
+  const sessionUser = await getCurrentUserAction();
+  if (!sessionUser) {
     return {
       success: false,
-      error: 'spaceId, userId, startDate, and endDate are all required.',
+      error: 'Statutory 401: You must be authenticated to submit a statutory asset requisition.',
+    };
+  }
+
+  // Bind strictly to the verified cryptographic session identity
+  const effectiveUserId = sessionUser.id;
+
+  // --- Input validation ---
+  if (!spaceId || !startDate || !endDate) {
+    return {
+      success: false,
+      error: 'spaceId, startDate, and endDate are all required.',
     };
   }
 
   if (new Date(endDate) < new Date(startDate)) {
-    return { success: false, error: 'end_date must be on or after start_date.' };
+    return { success: false, error: 'End date must be on or after start date.' };
   }
 
   try {
@@ -128,7 +142,7 @@ export async function createBookingRequest(
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
       .insert({
-        user_id: userId,
+        user_id: effectiveUserId,
         space_id: spaceId,
         start_date: startDate,
         end_date: endDate,
@@ -142,26 +156,23 @@ export async function createBookingRequest(
       console.error('[createBookingRequest] Booking insert error:', bookingError?.message);
       return {
         success: false,
-        error: bookingError?.message ?? 'Failed to create booking.',
+        error: 'Statutory booking requisition failed to submit. Please check parameters.',
       };
     }
 
     // ── Step 2: Write audit log immediately after booking ───────────────────
-    // Records the REQUESTED action with the booking ID so the full trail
-    // is available from the moment the request lands.
     const { data: auditLog, error: auditError } = await supabase
       .from('audit_logs')
       .insert({
         booking_id: booking.id,
         action: 'REQUESTED',
         reason: null,
-        performed_by: userId,
+        performed_by: effectiveUserId,
       })
       .select()
       .single();
 
     if (auditError || !auditLog) {
-      // Booking created but audit trail is broken — log critical warning.
       console.error(
         '[createBookingRequest] CRITICAL: booking created but audit log failed.',
         'booking_id:', booking.id,
@@ -169,7 +180,7 @@ export async function createBookingRequest(
       );
       return {
         success: false,
-        error: `Booking created (id: ${booking.id}) but audit log could not be written: ${auditError?.message}. Please contact support.`,
+        error: `Booking created (id: ${booking.id}) but audit log could not be written. Please contact administration.`,
       };
     }
 
@@ -177,7 +188,7 @@ export async function createBookingRequest(
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error creating booking.';
     console.error('[createBookingRequest] Unexpected error:', message);
-    return { success: false, error: message };
+    return { success: false, error: 'Requisition could not be finalized.' };
   }
 }
 
@@ -185,10 +196,7 @@ export async function createBookingRequest(
 // 3. updateBookingStatus()
 //    Updates booking status AND appends an immutable audit_log row recording
 //    the admin's ID, the action, and the reason.
-//
-//    Anti-corruption rule: 'rejected' and 'approved' require a non-empty reason.
-//    This mirrors the DB-level constraint chk_rejection_reason_mandatory but
-//    surfaces a user-friendly message instead of a raw Postgres error.
+//    SECURITY: Enforces session-derived admin role check to prevent IDOR.
 // ==============================================================================
 
 export async function updateBookingStatus(
@@ -197,11 +205,22 @@ export async function updateBookingStatus(
   newStatus: BookingStatus,
   reason: string | null = null
 ): Promise<ActionResult<{ booking: Booking; auditLog: AuditLog }>> {
-  // --- Input validation ---
-  if (!bookingId || !adminId || !newStatus) {
+  // Session authorization check (Defense against IDOR & privilege escalation)
+  const sessionUser = await getCurrentUserAction();
+  if (!sessionUser || sessionUser.role !== 'admin') {
     return {
       success: false,
-      error: 'bookingId, adminId, and newStatus are all required.',
+      error: 'Statutory 403 Forbidden: Only verified Institutional Administrators can review or update booking allocations.',
+    };
+  }
+
+  const effectiveAdminId = sessionUser.id;
+
+  // --- Input validation ---
+  if (!bookingId || !newStatus) {
+    return {
+      success: false,
+      error: 'bookingId and newStatus are required.',
     };
   }
 
@@ -209,8 +228,8 @@ export async function updateBookingStatus(
   if (requiresReason.includes(newStatus) && (!reason || reason.trim().length === 0)) {
     return {
       success: false,
-      error: `A non-empty reason is mandatory when setting status to '${newStatus}'. ` +
-        'This is required to maintain transparency and prevent arbitrary decisions.',
+      error: `A non-empty statutory justification is mandatory when setting status to '${newStatus}'. ` +
+        'This ensures anti-corruption transparency and institutional accountability.',
     };
   }
 
@@ -229,7 +248,7 @@ export async function updateBookingStatus(
       console.error('[updateBookingStatus] Update error:', updateError?.message);
       return {
         success: false,
-        error: updateError?.message ?? 'Booking not found or update failed.',
+        error: 'Booking allocation record could not be updated.',
       };
     }
 
@@ -242,26 +261,24 @@ export async function updateBookingStatus(
         booking_id: bookingId,
         action: auditAction,
         reason: reason?.trim() ?? null,
-        performed_by: adminId,
+        performed_by: effectiveAdminId,
       })
       .select()
       .single();
 
     if (auditError || !auditLog) {
-      // Status updated but audit trail is broken — extremely critical.
       console.error(
         '[updateBookingStatus] CRITICAL: status updated but audit log failed.',
         'booking_id:', bookingId,
         'new_status:', newStatus,
-        'admin_id:', adminId,
+        'admin_id:', effectiveAdminId,
         'error:', auditError?.message
       );
       return {
         success: false,
         error:
           `Booking status updated to '${newStatus}' (id: ${bookingId}) ` +
-          `but the audit log could not be written: ${auditError?.message}. ` +
-          'Please investigate immediately.',
+          `but the audit log could not be written. Please investigate immediately.`,
       };
     }
 
@@ -270,15 +287,14 @@ export async function updateBookingStatus(
     const message =
       err instanceof Error ? err.message : 'Unknown error updating booking status.';
     console.error('[updateBookingStatus] Unexpected error:', message);
-    return { success: false, error: message };
+    return { success: false, error: 'Allocation decision failed to commit.' };
   }
 }
 
 // ==============================================================================
 // 4. submitConditionReport()
 //    Inserts a condition_report row for a given booking phase.
-//    The DB enforces UNIQUE (booking_id, phase) — duplicate submissions return
-//    a readable error message instead of a raw Postgres constraint violation.
+//    SECURITY: Enforces session-derived ownership check before accepting reports.
 // ==============================================================================
 
 export async function submitConditionReport(
@@ -288,6 +304,15 @@ export async function submitConditionReport(
   notes: string | null = null,
   hasDamage: boolean = false
 ): Promise<ActionResult<ConditionReport>> {
+  // Session authentication check
+  const sessionUser = await getCurrentUserAction();
+  if (!sessionUser) {
+    return {
+      success: false,
+      error: 'Authentication required to submit photographic asset condition inspection.',
+    };
+  }
+
   // --- Input validation ---
   if (!bookingId || !phase || !photoUrl) {
     return {
@@ -303,15 +328,31 @@ export async function submitConditionReport(
     };
   }
 
-  if (!photoUrl.startsWith('http')) {
+  if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
     return {
       success: false,
-      error: 'photoUrl must be a valid URL (must start with http or https).',
+      error: 'photoUrl must be a secure URL (must start with https:// or http://).',
     };
   }
 
   try {
     const supabase = await getSupabase();
+
+    // Verify ownership if non-admin
+    if (sessionUser.role !== 'admin') {
+      const { data: bookingCheck, error: checkError } = await supabase
+        .from('bookings')
+        .select('user_id')
+        .eq('id', bookingId)
+        .single();
+
+      if (checkError || !bookingCheck || bookingCheck.user_id !== sessionUser.id) {
+        return {
+          success: false,
+          error: 'Statutory 403 Forbidden: You may only submit condition reports for bookings belonging to your organization.',
+        };
+      }
+    }
 
     const { data, error } = await supabase
       .from('condition_reports')
@@ -326,7 +367,6 @@ export async function submitConditionReport(
       .single();
 
     if (error) {
-      // Detect unique constraint violation for duplicate phase submission
       const isDuplicate =
         error.code === '23505' ||
         error.message.toLowerCase().includes('uq_booking_phase') ||
@@ -342,7 +382,7 @@ export async function submitConditionReport(
       }
 
       console.error('[submitConditionReport] Supabase error:', error.message);
-      return { success: false, error: error.message };
+      return { success: false, error: 'Condition report submission failed.' };
     }
 
     if (!data) {
@@ -357,6 +397,6 @@ export async function submitConditionReport(
     const message =
       err instanceof Error ? err.message : 'Unknown error submitting condition report.';
     console.error('[submitConditionReport] Unexpected error:', message);
-    return { success: false, error: message };
+    return { success: false, error: 'Failed to record condition report.' };
   }
 }

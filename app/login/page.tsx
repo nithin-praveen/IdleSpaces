@@ -7,7 +7,8 @@ import {
   evaluatePasswordStrength,
   DEMO_ACCOUNTS,
   type PasswordStrengthResult,
-} from '@/lib/auth';
+} from '@/lib/auth-client';
+import { loginWithDemoAccountAction } from '@/app/auth-actions';
 import { useAuth } from '@/components/AuthProvider';
 import {
   ShieldCheck,
@@ -92,18 +93,20 @@ function LoginForm() {
 
   const handleQuickFill = async (acc: typeof DEMO_ACCOUNTS[0]) => {
     setEmail(acc.email);
-    setPassword(acc.plainDemoPassword);
+    setPassword('••••••••••••');
     setErrorMessage(null);
     setIsSubmitting(true);
     try {
-      const res = await login(acc.email, acc.plainDemoPassword);
+      const res = await loginWithDemoAccountAction(acc.id);
       if (res.success) {
         const dest = acc.role === 'admin' ? '/admin' : '/discover';
         window.location.href = dest;
         return;
+      } else {
+        setErrorMessage(res.error || 'Failed to authenticate demo account.');
       }
-    } catch {
-      // fallback
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsSubmitting(false);
     }

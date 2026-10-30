@@ -21,7 +21,8 @@ export type BookingStatus =
   | 'approved'
   | 'rejected'
   | 'waitlisted'
-  | 'completed';
+  | 'completed'
+  | 'cancelled';
 
 export type ReportPhase = 'check-in' | 'check-out';
 

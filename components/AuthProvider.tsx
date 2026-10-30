@@ -2,11 +2,12 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import type { AuthUser } from '@/lib/auth';
-import { DEMO_ACCOUNTS } from '@/lib/auth';
+import type { AuthUser } from '@/lib/auth-client';
+import { DEMO_ACCOUNTS } from '@/lib/auth-client';
 import {
   getCurrentUserAction,
   loginAction,
+  loginWithDemoAccountAction,
   logoutAction,
   registerUserAction,
   type RegisterUserInput,
@@ -116,18 +117,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Demo role switcher for testing convenience
+  // Demo role switcher for testing convenience — uses safe server-side account ID matching
   const switchDemoRole = React.useCallback(
     async (role: 'admin' | 'ngo' | 'corporate') => {
       const demoAccount = DEMO_ACCOUNTS.find((acc) => acc.role === role);
       if (demoAccount) {
-        await loginAction(demoAccount.email, demoAccount.plainDemoPassword);
-        const updated = await getCurrentUserAction();
-        setUser(updated);
-        if (role === 'admin') {
-          window.location.href = '/admin';
-        } else {
-          window.location.href = '/discover';
+        const res = await loginWithDemoAccountAction(demoAccount.id);
+        if (res.success) {
+          setUser(res.user);
+          if (role === 'admin') {
+            window.location.href = '/admin';
+          } else {
+            window.location.href = '/discover';
+          }
         }
       }
     },

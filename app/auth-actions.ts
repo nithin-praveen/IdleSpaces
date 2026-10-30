@@ -1,21 +1,25 @@
 'use server';
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import {
   AuthUser,
   DEMO_ACCOUNTS,
+  DEMO_ACCOUNTS_SERVER,
   SESSION_COOKIE_NAME,
   SESSION_MAX_AGE_SECONDS,
   checkRateLimit,
+  checkRegistrationRateLimit,
   decodeSession,
   encodeSession,
   getRegisteredUserByEmail,
   getSecurityAuditLogs,
   hashPassword,
+  recordRegistrationAttempt,
   recordSecurityEvent,
   registerFailedAttempt,
   resetFailedAttempts,
   saveRegisteredUser,
+  verifyPasswordHash,
 } from '@/lib/auth';
 import { createServerClient } from '@supabase/ssr';
 import type { Database } from '@/types/database';
@@ -65,8 +69,14 @@ export async function loginAction(
     };
   }
 
+  // Determine client IP to prevent brute-force DoS lockout of administrative accounts
+  const headerStore = await headers();
+  const clientIp = headerStore.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local';
+  const isRootAdmin = email === 'dean.admin@college.gov.in';
+  const rateLimitKey = isRootAdmin ? `${clientIp}:${email}` : email;
+
   // 2. Check Brute Force Lockout
-  const limitCheck = checkRateLimit(email);
+  const limitCheck = checkRateLimit(rateLimitKey, isRootAdmin);
   if (limitCheck.isLocked) {
     return {
       success: false,
@@ -77,30 +87,36 @@ export async function loginAction(
     };
   }
 
-  // 3. Check Demo Accounts First for immediate testing & judging
-  const demoMatch = DEMO_ACCOUNTS.find(
-    (acc) => acc.email.toLowerCase() === email && acc.plainDemoPassword === password
+  // 3. Check Demo Accounts First for immediate testing & evaluation (Server-only credentials)
+  const demoMatch = DEMO_ACCOUNTS_SERVER.find(
+    (acc) => acc.email.toLowerCase() === email
   );
 
   let authenticatedUser: AuthUser | null = null;
 
   if (demoMatch) {
-    authenticatedUser = {
-      id: demoMatch.id,
-      email: demoMatch.email,
-      name: demoMatch.name,
-      role: demoMatch.role,
-      tier: demoMatch.tier,
-      organization: demoMatch.organization,
-      department: demoMatch.department,
-      lastLogin: new Date().toISOString(),
-    };
+    const isMatch =
+      demoMatch.plainDemoPassword === password ||
+      (await verifyPasswordHash(password, demoMatch.passwordHash));
+
+    if (isMatch) {
+      authenticatedUser = {
+        id: demoMatch.id,
+        email: demoMatch.email,
+        name: demoMatch.name,
+        role: demoMatch.role,
+        tier: demoMatch.tier,
+        organization: demoMatch.organization,
+        department: demoMatch.department,
+        lastLogin: new Date().toISOString(),
+      };
+    }
   } else {
-    // 3b. Check dynamically registered users
+    // 3b. Check dynamically registered users with PBKDF2 verification
     const registered = getRegisteredUserByEmail(email);
     if (registered) {
-      const computedHash = await hashPassword(password);
-      if (registered.plainPassword === password || registered.passwordHash === computedHash) {
+      const isMatch = await verifyPasswordHash(password, registered.passwordHash);
+      if (isMatch) {
         authenticatedUser = {
           id: registered.id,
           email: registered.email,
@@ -151,7 +167,6 @@ export async function loginAction(
         });
 
         if (!authError && authData.user) {
-          // Fetch role from users table
           const { data: profile } = await supabase
             .from('users')
             .select('*')
@@ -176,7 +191,7 @@ export async function loginAction(
 
   // 5. If Authentication Fails
   if (!authenticatedUser) {
-    const failureRecord = registerFailedAttempt(email);
+    const failureRecord = registerFailedAttempt(rateLimitKey, email);
 
     if (failureRecord.isLocked) {
       return {
@@ -196,7 +211,7 @@ export async function loginAction(
   }
 
   // 6. Reset rate limit counter on success
-  resetFailedAttempts(email);
+  resetFailedAttempts(rateLimitKey);
 
   // 7. Record central security audit event
   recordSecurityEvent({
@@ -204,10 +219,10 @@ export async function loginAction(
     email: authenticatedUser.email,
     role: authenticatedUser.role,
     status: 'SUCCESS',
-    details: `User authenticated as ${authenticatedUser.role.toUpperCase()} (${authenticatedUser.organization}). Session token established.`,
+    details: `User authenticated as ${authenticatedUser.role.toUpperCase()} (${authenticatedUser.organization}). HMAC session established.`,
   });
 
-  // 8. Issue HttpOnly secure session cookie
+  // 8. Issue HttpOnly secure signed session cookie
   const cookieStore = await cookies();
   const sessionToken = encodeSession(authenticatedUser);
 
@@ -223,6 +238,53 @@ export async function loginAction(
     success: true,
     user: authenticatedUser,
     message: `Welcome back, ${authenticatedUser.name}. Authenticated securely as ${authenticatedUser.role.toUpperCase()}.`,
+  };
+}
+
+/**
+ * Direct 1-click authentication for authorized demo accounts.
+ * Safe for client-side demo role selectors — zero credentials bundled to the browser.
+ */
+export async function loginWithDemoAccountAction(accountId: string): Promise<LoginResult> {
+  const demoMatch = DEMO_ACCOUNTS_SERVER.find((acc) => acc.id === accountId);
+  if (!demoMatch) {
+    return { success: false, error: 'Unauthorized demo account selection.' };
+  }
+
+  const authenticatedUser: AuthUser = {
+    id: demoMatch.id,
+    email: demoMatch.email,
+    name: demoMatch.name,
+    role: demoMatch.role,
+    tier: demoMatch.tier,
+    organization: demoMatch.organization,
+    department: demoMatch.department,
+    lastLogin: new Date().toISOString(),
+  };
+
+  recordSecurityEvent({
+    eventType: 'LOGIN_SUCCESS',
+    email: authenticatedUser.email,
+    role: authenticatedUser.role,
+    status: 'SUCCESS',
+    details: `Demo account authenticated as ${authenticatedUser.role.toUpperCase()} (${authenticatedUser.organization}). HMAC session token established.`,
+  });
+
+  const cookieStore = await cookies();
+  const sessionToken = encodeSession(authenticatedUser);
+
+  cookieStore.set(SESSION_COOKIE_NAME, sessionToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: SESSION_MAX_AGE_SECONDS,
+  });
+
+  return {
+    success: true,
+    user: authenticatedUser,
+    message: `Welcome back, ${authenticatedUser.name}.`,
   };
 }
 
@@ -288,6 +350,18 @@ export async function getSecurityAuditLogsAction() {
  * Register a new applicant or community organization user
  */
 export async function registerUserAction(input: RegisterUserInput): Promise<LoginResult> {
+  const headerStore = await headers();
+  const clientIp = headerStore.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local';
+
+  // 0. Rate limiting for registration
+  const regLimit = checkRegistrationRateLimit(clientIp);
+  if (!regLimit.isAllowed) {
+    return {
+      success: false,
+      error: `Registration limit reached for this network. Please retry in ${regLimit.remainingSeconds} seconds.`,
+    };
+  }
+
   const name = input.name?.trim();
   const email = input.email?.toLowerCase().trim();
   const organization = input.organization?.trim();
@@ -306,7 +380,7 @@ export async function registerUserAction(input: RegisterUserInput): Promise<Logi
     return { success: false, error: 'Organization or community entity name is required.' };
   }
   if (!['ngo', 'corporate'].includes(role)) {
-    return { success: false, error: 'Please select a valid role (NGO or Corporate / Commercial).' };
+    return { success: false, error: 'Please select a valid role (NGO/Societal or Private).' };
   }
   if (!password || password.length < 8) {
     return { success: false, error: 'Password must contain at least 8 characters.' };
@@ -322,7 +396,10 @@ export async function registerUserAction(input: RegisterUserInput): Promise<Logi
     };
   }
 
-  // 3. Hash password
+  // Record rate limit attempt
+  recordRegistrationAttempt(clientIp);
+
+  // 3. Hash password using PBKDF2 (10,000 iterations)
   const passwordHash = await hashPassword(password);
   const userId = `u-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   const tier: 1 | 2 = role === 'ngo' ? 1 : 2;
@@ -334,15 +411,14 @@ export async function registerUserAction(input: RegisterUserInput): Promise<Logi
     role,
     tier,
     organization,
-    department: department || (role === 'ngo' ? 'Community Outreach' : 'Corporate Relations'),
+    department: department || (role === 'ngo' ? 'Community Outreach' : 'Private Sector Relations'),
     lastLogin: new Date().toISOString(),
   };
 
-  // 4. Save to in-memory store
+  // 4. Save to in-memory store (never stores plain password)
   saveRegisteredUser({
     ...newUser,
     passwordHash,
-    plainPassword: password,
   });
 
   // 5. Optionally sync to Supabase if configured
@@ -367,11 +443,12 @@ export async function registerUserAction(input: RegisterUserInput): Promise<Logi
         },
       });
 
+      // Force role to non-admin on remote signup to prevent self-elevation
       const { data: authData } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { full_name: name, organization, role },
+          data: { full_name: name, organization, role: role === 'corporate' ? 'corporate' : 'ngo' },
         },
       });
 
@@ -398,7 +475,7 @@ export async function registerUserAction(input: RegisterUserInput): Promise<Logi
     details: `New ${role.toUpperCase()} account successfully registered: ${name} (${organization}). Session issued.`,
   });
 
-  // 7. Issue HttpOnly session cookie
+  // 7. Issue HttpOnly HMAC-signed session cookie
   const cookieStore = await cookies();
   const sessionToken = encodeSession(newUser);
   cookieStore.set(SESSION_COOKIE_NAME, sessionToken, {
@@ -415,5 +492,3 @@ export async function registerUserAction(input: RegisterUserInput): Promise<Logi
     message: `Account created successfully! Welcome to IdleSpaces, ${name}.`,
   };
 }
-
-

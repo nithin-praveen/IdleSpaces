@@ -31,7 +31,7 @@ END $$;
 
 -- Booking status life cycle:
 DO $$ BEGIN
-    CREATE TYPE booking_status AS ENUM ('pending', 'approved', 'rejected', 'waitlisted', 'completed');
+    CREATE TYPE booking_status AS ENUM ('pending', 'approved', 'rejected', 'waitlisted', 'completed', 'cancelled');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
@@ -178,10 +178,9 @@ DECLARE
 BEGIN
     raw_role := COALESCE(NEW.raw_user_meta_data->>'role', 'ngo');
     
-    IF raw_role = 'admin' THEN
-        user_role_val := 'admin'::public.user_role;
-        user_tier_val := 1;
-    ELSIF raw_role = 'corporate' THEN
+    -- CRITICAL DEFENSE (C2): Prevent client-controlled privilege escalation.
+    -- Client signup metadata cannot elevate user to 'admin'.
+    IF raw_role = 'corporate' THEN
         user_role_val := 'corporate'::public.user_role;
         user_tier_val := 2;
     ELSE
@@ -199,8 +198,8 @@ BEGIN
     ON CONFLICT (id) DO UPDATE
     SET 
         name = EXCLUDED.name,
-        role = EXCLUDED.role,
-        tier = EXCLUDED.tier,
+        role = CASE WHEN public.users.role = 'admin' THEN 'admin'::public.user_role ELSE EXCLUDED.role END,
+        tier = CASE WHEN public.users.role = 'admin' THEN 1 ELSE EXCLUDED.tier END,
         updated_at = timezone('utc'::text, now());
 
     RETURN NEW;
@@ -274,7 +273,7 @@ CREATE POLICY "Users can cancel pending bookings"
     ON public.bookings FOR UPDATE
     TO authenticated
     USING (auth.uid() = user_id AND status = 'pending')
-    WITH CHECK (auth.uid() = user_id);
+    WITH CHECK (auth.uid() = user_id AND status = 'cancelled');
 
 CREATE POLICY "Admins have full control over bookings"
     ON public.bookings FOR ALL
@@ -296,7 +295,12 @@ CREATE POLICY "Audit logs are viewable by admins and booking owners"
 CREATE POLICY "Authenticated users can log their actions"
     ON public.audit_logs FOR INSERT
     TO authenticated
-    WITH CHECK (auth.uid() = performed_by);
+    WITH CHECK (
+        auth.uid() = performed_by AND (
+            public.is_admin() OR 
+            action IN ('REQUESTED', 'CANCELLED', 'CONDITION_REPORT')
+        )
+    );
 
 -- 5. condition_reports policies
 CREATE POLICY "Condition reports viewable by booking owners and admins"

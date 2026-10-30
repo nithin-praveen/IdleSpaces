@@ -7,7 +7,8 @@ import {
   evaluatePasswordStrength,
   DEMO_ACCOUNTS,
   type PasswordStrengthResult,
-} from '@/lib/auth';
+} from '@/lib/auth-client';
+import { loginWithDemoAccountAction } from '@/app/auth-actions';
 import { useAuth } from '@/components/AuthProvider';
 import {
   Users,
@@ -60,11 +61,27 @@ function UserLoginForm() {
     return DEMO_ACCOUNTS.filter((acc) => acc.role !== 'admin');
   }, []);
 
-  const handleQuickFill = (acc: typeof DEMO_ACCOUNTS[0]) => {
+  const handleQuickFill = async (acc: typeof DEMO_ACCOUNTS[0]) => {
     setEmail(acc.email);
-    setPassword(acc.plainDemoPassword);
+    setPassword('••••••••••••');
     setMode('login');
     setErrorMessage(null);
+    setIsSubmitting(true);
+    try {
+      const res = await loginWithDemoAccountAction(acc.id);
+      if (res.success) {
+        setSuccessMessage('Authentication successful! Directing to spaces catalog...');
+        setTimeout(() => {
+          router.push(redirectTarget);
+        }, 500);
+      } else {
+        setErrorMessage(res.error || 'Authentication failed.');
+      }
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleLoginSubmit = async (e: React.FormEvent) => {

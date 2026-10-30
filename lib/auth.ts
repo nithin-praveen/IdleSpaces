@@ -1,31 +1,18 @@
+import crypto from 'crypto';
 import type { UserRole } from '@/types/database';
+export * from './auth-client';
+import { AuthUser, SecurityEvent, DEMO_ACCOUNTS } from './auth-client';
 
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  tier: 1 | 2;
-  organization: string;
-  department?: string;
-  avatarUrl?: string;
-  lastLogin?: string;
-}
+const AUTH_SECRET =
+  process.env.AUTH_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
+  'idlespaces_statutory_secret_gov_college_2026_salt_hmac_protected_key_!@#';
 
-export interface SecurityEvent {
-  id: string;
-  timestamp: string;
-  eventType: 'LOGIN_SUCCESS' | 'LOGIN_FAILED' | 'ACCOUNT_LOCKED' | 'UNAUTHORIZED_ACCESS' | 'LOGOUT' | 'PASSWORD_RESET_ATTEMPT';
-  email: string;
-  role?: string;
-  ipAddress?: string;
-  userAgent?: string;
-  status: 'SUCCESS' | 'FAILURE' | 'BLOCKED';
-  details: string;
-}
-
-// Pre-configured Verified Institutional Accounts for Demo & Evaluation
-export const DEMO_ACCOUNTS: (AuthUser & { passwordHash: string; plainDemoPassword: string })[] = [
+/**
+ * Server-only verified institutional accounts for demonstration & evaluation.
+ * STRICTLY kept on the server; never exposed to client bundles.
+ */
+export const DEMO_ACCOUNTS_SERVER: (AuthUser & { passwordHash: string; plainDemoPassword: string })[] = [
   {
     id: 'a0000000-0000-0000-0000-000000000001',
     email: 'dean.admin@college.gov.in',
@@ -35,8 +22,8 @@ export const DEMO_ACCOUNTS: (AuthUser & { passwordHash: string; plainDemoPasswor
     organization: 'Govt. Central College Administrative Directorate',
     department: 'Directorate of Public Assets & Oversight',
     plainDemoPassword: 'Admin@GovSecure2026!',
-    // SHA-256 hash of 'Admin@GovSecure2026!'
-    passwordHash: '8b788a4e8d3566164d95feea95914c62fa536b0cbfe9c1584db22dbbb7780c13',
+    // PBKDF2-SHA256 (10,000 rounds) hash
+    passwordHash: '966ff83758a6d00a79f7e4bb015e041e5228914358ece478802dc23e7b397bcb',
   },
   {
     id: 'b1111111-2222-3333-4444-555555555001',
@@ -47,8 +34,8 @@ export const DEMO_ACCOUNTS: (AuthUser & { passwordHash: string; plainDemoPasswor
     organization: 'Pratham Youth Education Initiative (NGO)',
     department: 'Community Outreach & Digital Literacy',
     plainDemoPassword: 'Ngo@Community2026!',
-    // SHA-256 hash of 'Ngo@Community2026!'
-    passwordHash: 'e6fb6948fe754d9c490ff67d30aa4933979eaec612185566f7f2b96c73df6ce3',
+    // PBKDF2-SHA256 (10,000 rounds) hash
+    passwordHash: '2addc0cf18dcf6f8d78820ba16114e91b84f3f74eae0781f564c0a42bee4b811',
   },
   {
     id: 'c2222222-3333-4444-5555-666666666002',
@@ -59,15 +46,14 @@ export const DEMO_ACCOUNTS: (AuthUser & { passwordHash: string; plainDemoPasswor
     organization: 'Apex Infotech Solutions Ltd (CSR Wing)',
     department: 'Corporate Social Responsibility & Innovation',
     plainDemoPassword: 'Corp@Innovate2026!',
-    // SHA-256 hash of 'Corp@Innovate2026!'
-    passwordHash: 'fa1124230869385ebc6bf9e25d60ff3fec02ec10a4cceb56aebe54dfbd33f2d2',
+    // PBKDF2-SHA256 (10,000 rounds) hash
+    passwordHash: '86757ed1ba832b2f7fb777fcff8d57a18463e493d16100b39c2a105654316407',
   },
 ];
 
 // Dynamic In-Memory Store for Registered Users (Community, NGO, Corporate)
 export interface RegisteredUserRecord extends AuthUser {
   passwordHash: string;
-  plainPassword?: string;
 }
 
 const registeredUsers = new Map<string, RegisteredUserRecord>();
@@ -77,7 +63,20 @@ export function getRegisteredUserByEmail(email: string): RegisteredUserRecord | 
 }
 
 export function saveRegisteredUser(record: RegisteredUserRecord): void {
-  registeredUsers.set(record.email.toLowerCase().trim(), record);
+  // CRITICAL DEFENSE: Never store plain passwords in memory or database records
+  const sanitized: RegisteredUserRecord = {
+    id: record.id,
+    email: record.email.toLowerCase().trim(),
+    name: record.name,
+    role: record.role,
+    tier: record.tier,
+    organization: record.organization,
+    department: record.department,
+    passwordHash: record.passwordHash,
+    avatarUrl: record.avatarUrl,
+    lastLogin: record.lastLogin,
+  };
+  registeredUsers.set(sanitized.email, sanitized);
 }
 
 // In-Memory Rate Limiting & Account Lockout Store
@@ -101,7 +100,7 @@ const globalSecurityAuditLogs: SecurityEvent[] = [
     email: 'dean.admin@college.gov.in',
     role: 'admin',
     status: 'SUCCESS',
-    details: 'Institutional Admin authenticated with session token issued (256-bit AES encryption).',
+    details: 'Institutional Admin authenticated with HMAC-SHA256 tamper-evident cryptographic session.',
   },
   {
     id: 'sec-002',
@@ -123,7 +122,6 @@ export function recordSecurityEvent(event: Omit<SecurityEvent, 'id' | 'timestamp
     timestamp: new Date().toISOString(),
   };
   globalSecurityAuditLogs.unshift(newEvent);
-  // Keep last 100 events
   if (globalSecurityAuditLogs.length > 100) {
     globalSecurityAuditLogs.pop();
   }
@@ -135,35 +133,61 @@ export function getSecurityAuditLogs(): SecurityEvent[] {
 }
 
 /**
- * Simple SHA-256 hasher for cross-environment consistency
+ * Hardened Password Hashing using PBKDF2 (SHA-256, 10,000 iterations)
+ * Also validates against legacy SHA-256 for demo accounts.
  */
 export async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password + ':idlespaces_gov_salt_2026');
-  
-  if (typeof crypto !== 'undefined' && crypto.subtle) {
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-  
-  // Fallback for environments where crypto.subtle is unavailable
-  let hash = 0;
-  for (let i = 0; i < password.length; i++) {
-    const char = password.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash |= 0;
-  }
-  return Math.abs(hash).toString(16).padStart(32, '0');
+  const salt = 'idlespaces_gov_statutory_salt_2026';
+  return new Promise((resolve, reject) => {
+    crypto.pbkdf2(password, salt, 10000, 32, 'sha256', (err, derivedKey) => {
+      if (err) reject(err);
+      else resolve(derivedKey.toString('hex'));
+    });
+  });
 }
 
 /**
- * Check if an email is currently locked out due to repeated failed logins
+ * Hardened Password Verification using PBKDF2 (SHA-256, 10,000 iterations)
+ * Supports PBKDF2 as well as SHA-256 for backward compatibility.
  */
-export function checkRateLimit(email: string): { isLocked: boolean; remainingSeconds: number; attemptsRemaining: number } {
-  const normalizedEmail = email.toLowerCase().trim();
+export async function verifyPasswordHash(password: string, storedHash: string): Promise<boolean> {
+  const computedPbkdf2 = await hashPassword(password);
+  if (computedPbkdf2 === storedHash) {
+    return true;
+  }
+  try {
+    const b1 = Buffer.from(computedPbkdf2, 'hex');
+    const b2 = Buffer.from(storedHash, 'hex');
+    if (b1.length === b2.length && crypto.timingSafeEqual(b1, b2)) {
+      return true;
+    }
+  } catch {}
+
+  const sha256Hash = crypto.createHash('sha256').update(password).digest('hex');
+  if (sha256Hash === storedHash) {
+    return true;
+  }
+
+  const legacyData = Buffer.from(password + ':idlespaces_gov_salt_2026', 'utf-8');
+  const legacyHash = crypto.createHash('sha256').update(legacyData).digest('hex');
+  if (legacyHash === storedHash) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Check if a client/email is currently locked out due to repeated failed logins.
+ * Protects root institutional accounts from unauthenticated denial-of-service lockout.
+ */
+export function checkRateLimit(
+  key: string,
+  isRootAdmin: boolean = false
+): { isLocked: boolean; remainingSeconds: number; attemptsRemaining: number } {
+  const normalizedKey = key.toLowerCase().trim();
   const now = Date.now();
-  const record = loginAttempts.get(normalizedEmail);
+  const record = loginAttempts.get(normalizedKey);
 
   if (!record) {
     return { isLocked: false, remainingSeconds: 0, attemptsRemaining: MAX_ATTEMPTS };
@@ -177,7 +201,7 @@ export function checkRateLimit(email: string): { isLocked: boolean; remainingSec
 
   // Reset window if expired
   if (now - record.firstAttempt > ATTEMPT_WINDOW_MS) {
-    loginAttempts.delete(normalizedEmail);
+    loginAttempts.delete(normalizedKey);
     return { isLocked: false, remainingSeconds: 0, attemptsRemaining: MAX_ATTEMPTS };
   }
 
@@ -188,12 +212,16 @@ export function checkRateLimit(email: string): { isLocked: boolean; remainingSec
 /**
  * Record a failed login attempt; activates lockout if threshold exceeded
  */
-export function registerFailedAttempt(email: string): { isLocked: boolean; remainingSeconds: number; attemptsRemaining: number } {
-  const normalizedEmail = email.toLowerCase().trim();
+export function registerFailedAttempt(
+  key: string,
+  auditEmail: string = key
+): { isLocked: boolean; remainingSeconds: number; attemptsRemaining: number } {
+  const normalizedKey = key.toLowerCase().trim();
+  const normalizedAuditEmail = auditEmail.toLowerCase().trim();
   const now = Date.now();
-  let record = loginAttempts.get(normalizedEmail);
+  let record = loginAttempts.get(normalizedKey);
 
-  if (!record || (now - record.firstAttempt > ATTEMPT_WINDOW_MS)) {
+  if (!record || now - record.firstAttempt > ATTEMPT_WINDOW_MS) {
     record = { count: 1, firstAttempt: now };
   } else {
     record.count += 1;
@@ -201,13 +229,13 @@ export function registerFailedAttempt(email: string): { isLocked: boolean; remai
 
   if (record.count >= MAX_ATTEMPTS) {
     record.lockedUntil = now + LOCKOUT_DURATION_MS;
-    loginAttempts.set(normalizedEmail, record);
+    loginAttempts.set(normalizedKey, record);
 
     recordSecurityEvent({
       eventType: 'ACCOUNT_LOCKED',
-      email: normalizedEmail,
+      email: normalizedAuditEmail,
       status: 'BLOCKED',
-      details: `Account temporarily locked out for 15 minutes after ${MAX_ATTEMPTS} consecutive failed attempts.`,
+      details: `Client key temporarily locked out for 15 minutes after ${MAX_ATTEMPTS} consecutive failed attempts.`,
     });
 
     return {
@@ -217,11 +245,11 @@ export function registerFailedAttempt(email: string): { isLocked: boolean; remai
     };
   }
 
-  loginAttempts.set(normalizedEmail, record);
+  loginAttempts.set(normalizedKey, record);
 
   recordSecurityEvent({
     eventType: 'LOGIN_FAILED',
-    email: normalizedEmail,
+    email: normalizedAuditEmail,
     status: 'FAILURE',
     details: `Failed credentials attempt (${record.count}/${MAX_ATTEMPTS}).`,
   });
@@ -236,67 +264,37 @@ export function registerFailedAttempt(email: string): { isLocked: boolean; remai
 /**
  * Clear failed attempts upon successful login
  */
-export function resetFailedAttempts(email: string) {
-  loginAttempts.delete(email.toLowerCase().trim());
+export function resetFailedAttempts(key: string) {
+  loginAttempts.delete(key.toLowerCase().trim());
 }
 
-/**
- * Password strength evaluation
- */
-export interface PasswordStrengthResult {
-  score: number; // 0 to 4
-  label: 'Very Weak' | 'Weak' | 'Medium' | 'Strong' | 'Very Strong';
-  color: string;
-  hasMinLength: boolean;
-  hasUppercase: boolean;
-  hasLowercase: boolean;
-  hasNumber: boolean;
-  hasSpecial: boolean;
-  feedback: string[];
+// In-Memory Registration Rate Limiting Store
+const registrationAttempts = new Map<string, { count: number; firstAttempt: number }>();
+const MAX_REGISTRATIONS_PER_WINDOW = 10;
+const REGISTRATION_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+export function checkRegistrationRateLimit(identifier: string): { isAllowed: boolean; remainingSeconds: number } {
+  const now = Date.now();
+  const record = registrationAttempts.get(identifier);
+  if (!record || now - record.firstAttempt > REGISTRATION_WINDOW_MS) {
+    return { isAllowed: true, remainingSeconds: 0 };
+  }
+  if (record.count >= MAX_REGISTRATIONS_PER_WINDOW) {
+    const remainingSeconds = Math.ceil((REGISTRATION_WINDOW_MS - (now - record.firstAttempt)) / 1000);
+    return { isAllowed: false, remainingSeconds };
+  }
+  return { isAllowed: true, remainingSeconds: 0 };
 }
 
-export function evaluatePasswordStrength(password: string): PasswordStrengthResult {
-  const hasMinLength = password.length >= 8;
-  const hasUppercase = /[A-Z]/.test(password);
-  const hasLowercase = /[a-z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const hasSpecial = /[^A-Za-z0-9]/.test(password);
-
-  const criteriaMet = [hasMinLength, hasUppercase, hasLowercase, hasNumber, hasSpecial].filter(Boolean).length;
-  
-  let score = 0;
-  if (password.length === 0) score = 0;
-  else if (criteriaMet <= 2) score = 1;
-  else if (criteriaMet === 3) score = 2;
-  else if (criteriaMet === 4) score = 3;
-  else score = 4;
-
-  const feedback: string[] = [];
-  if (!hasMinLength) feedback.push('At least 8 characters required');
-  if (!hasUppercase) feedback.push('Include at least one uppercase letter (A-Z)');
-  if (!hasLowercase) feedback.push('Include at least one lowercase letter (a-z)');
-  if (!hasNumber) feedback.push('Include at least one number (0-9)');
-  if (!hasSpecial) feedback.push('Include at least one symbol (!@#$%^&*)');
-
-  const labels: Record<number, { label: PasswordStrengthResult['label']; color: string }> = {
-    0: { label: 'Very Weak', color: 'bg-slate-300' },
-    1: { label: 'Weak', color: 'bg-red-500' },
-    2: { label: 'Medium', color: 'bg-amber-500' },
-    3: { label: 'Strong', color: 'bg-blue-600' },
-    4: { label: 'Very Strong', color: 'bg-emerald-600' },
-  };
-
-  return {
-    score,
-    label: labels[score].label,
-    color: labels[score].color,
-    hasMinLength,
-    hasUppercase,
-    hasLowercase,
-    hasNumber,
-    hasSpecial,
-    feedback,
-  };
+export function recordRegistrationAttempt(identifier: string): void {
+  const now = Date.now();
+  let record = registrationAttempts.get(identifier);
+  if (!record || now - record.firstAttempt > REGISTRATION_WINDOW_MS) {
+    record = { count: 1, firstAttempt: now };
+  } else {
+    record.count += 1;
+  }
+  registrationAttempts.set(identifier, record);
 }
 
 /**
@@ -311,29 +309,74 @@ export interface SessionPayload {
   expiresAt: number;
 }
 
+/**
+ * CRITICAL 1 FIX: Cryptographically sign session token with HMAC-SHA256
+ * Format: payloadBase64.hmacSignature
+ * Guarantees that client cannot tamper with 'role: admin' or forge sessions.
+ */
 export function encodeSession(user: AuthUser): string {
   const payload: SessionPayload = {
     user,
     issuedAt: Date.now(),
     expiresAt: Date.now() + SESSION_MAX_AGE_SECONDS * 1000,
   };
-  return Buffer.from(JSON.stringify(payload)).toString('base64');
+  const payloadBase64 = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = crypto
+    .createHmac('sha256', AUTH_SECRET)
+    .update(payloadBase64)
+    .digest('base64url');
+  return `${payloadBase64}.${signature}`;
 }
 
+/**
+ * Verify cryptographic HMAC-SHA256 signature and unpack session
+ */
 export function decodeSession(token: string): SessionPayload | null {
   try {
-    const raw = Buffer.from(token, 'base64').toString('utf-8');
+    if (!token || typeof token !== 'string') return null;
+
+    const parts = token.split('.');
+    if (parts.length !== 2) {
+      // Reject any unsigned or legacy tampered token immediately
+      return null;
+    }
+
+    const [payloadBase64, signature] = parts;
+    const expectedSignature = crypto
+      .createHmac('sha256', AUTH_SECRET)
+      .update(payloadBase64)
+      .digest('base64url');
+
+    const expectedBuf = Buffer.from(expectedSignature);
+    const actualBuf = Buffer.from(signature);
+
+    // Constant-time comparison to prevent timing side-channel attacks
+    if (expectedBuf.length !== actualBuf.length || !crypto.timingSafeEqual(expectedBuf, actualBuf)) {
+      console.warn('[Security] Invalid session signature detected; potential tampering blocked.');
+      return null;
+    }
+
+    const raw = Buffer.from(payloadBase64, 'base64url').toString('utf-8');
     const payload = JSON.parse(raw) as SessionPayload;
     const user = payload?.user;
-    const validUser = user && typeof user.id === 'string' && typeof user.email === 'string' &&
-      typeof user.name === 'string' && ['admin', 'ngo', 'corporate', 'community'].includes(user.role);
-    if (!validUser || typeof payload.issuedAt !== 'number' || typeof payload.expiresAt !== 'number' ||
-        payload.issuedAt > Date.now() || payload.expiresAt <= Date.now()) {
-      return null; // Expired
+    const validUser =
+      user &&
+      typeof user.id === 'string' &&
+      typeof user.email === 'string' &&
+      typeof user.name === 'string' &&
+      ['admin', 'ngo', 'corporate', 'community'].includes(user.role);
+
+    if (
+      !validUser ||
+      typeof payload.issuedAt !== 'number' ||
+      typeof payload.expiresAt !== 'number' ||
+      payload.issuedAt > Date.now() ||
+      payload.expiresAt <= Date.now()
+    ) {
+      return null; // Expired or future timestamp
     }
     return payload;
   } catch {
     return null;
   }
 }
-
